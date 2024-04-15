@@ -2,16 +2,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View, FlatList, Image, Modal, Alert, RefreshControl } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart, faPenToSquare, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile, faCirclePlus, faThumbsUp, faCircleMinus, faTrash } from '@fortawesome/free-solid-svg-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AddGame from './addGames';
 import Loader from '../../registration/components/loader';
 import RatingGame from '../commons/raiting';
+import { DeleteUserGame, GetUserCreatedGames } from '../../api/api';
 
 
 const MyGamess = () => {
 
-	// const refresh = useRefresh();
 
 	const [addGameVisible, setAddGameVisible] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
@@ -23,32 +22,23 @@ const MyGamess = () => {
 	const [refreshing, setRefreshing] = useState(false);
 
 
-	const getUserCreatedGames = useCallback(async () => {
-		setLoading(true);
-		try {
-			const id = await AsyncStorage.getItem('user_id');
-			const url = ('http://176.36.224.228:24242/api_v1/getUserCreatedGames?' + new URLSearchParams({ user_id: id }));
-			const response = await fetch(url);
-			const json = await response.json();
-			console.log(json);
-			setData(json?.games);
-			setLoading(false);
-		} catch (error) {
-			console.error(error);
-			console.log(error.message);
+	useEffect(() => {
+		const fetchData = async () => {
+			setLoading(true);
+			const response = await GetUserCreatedGames();
+			setData(response);
 			setLoading(false);
 		}
+		fetchData();
 	}, []);
 
-	useEffect(() => {
-		getUserCreatedGames();
-	}, []);
 
-	const onRefresh = useCallback(() => {
+	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
-		getUserCreatedGames();
+		const response = await GetUserCreatedGames();
+		setData(response);
 		setRefreshing(false);
-	}, []);
+	}, [setData]);
 
 
 	const deleteUserGame = (idGame) => {
@@ -60,47 +50,23 @@ const MyGamess = () => {
 			},
 			{
 				text: 'OK', onPress: async () => {
-					console.log('OK Pressed');
 					setData(data.filter((item) => item.game_id !== idGame));
-					try {
-						const url = "http://176.36.224.228:24242/api_v1/deleteUserGame";
-						const idUser = await AsyncStorage.getItem('user_id');
-						const response = await fetch(url, {
-							method: 'POST',
-							headers: {
-								Accept: 'application/json',
-								'Content-Type': 'application/json'
-							},
-							body: JSON.stringify({
-								user_id: idUser,
-								game_id: idGame,
-							}),
-						});
-						const json = await response.json();
-						console.log(json?.status)
-					} catch (error) {
-						console.log('Incorrect remove game in select game');
-						console.log(error);
-					};
+					const response = await DeleteUserGame(idGame);
 				}
 			},
 		]);
 	};
-
+	
 	const handleData = (dataFromChild) => {
 		setAddGameVisible(!addGameVisible);
 		setUpDate(false);
-		if (dataFromChild === "відповідь, щоб закрилось вікно додавання гри") {
-			console.log('відповідь, щоб закрилось вікно додавання гри');
+		if (dataFromChild === "close window") {
+			console.log('close window');
 		} else {
 			const getIdGame = dataFromChild.game_id;
 			if (gameIdForUpDAteInfa !== getIdGame) {
 				setData([...data, dataFromChild]);
-				// console.log(dataFromChild);
-				console.log('додавання гри');
-				// return;
 			} else {
-				console.log('оновлення гри');
 			};
 		};
 	};
@@ -261,8 +227,6 @@ const styles = StyleSheet.create({
 		color: 'black',
 		fontSize: 24,
 	},
-	blockIcon: {
-	},
 	rating: {
 		display: 'flex',
 		flexDirection: 'row',
@@ -274,8 +238,6 @@ const styles = StyleSheet.create({
 		padding: 7,
 		backgroundColor: '#EEC9B0',
 		height: '100%',
-	},
-	head: {
 	},
 	arrowLeft: {
 		padding: 10,
@@ -320,21 +282,16 @@ const styles = StyleSheet.create({
 		gap: 30,
 		height: '62%',
 	},
-	bodyInfaItem: {
-	},
 	bodyInfaTitle: {
 		fontSize: 34,
 		color: '#8D6349',
 		fontWeight: '500',
 		paddingBottom: 5,
-
 	},
 	bodyInfaText: {
 		fontSize: 18,
 		color: 'black',
 		fontWeight: '400',
-	},
-	paddingBottom: {
 	},
 	fontAwesomeIcon: {
 		color: 'red'

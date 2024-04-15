@@ -51,12 +51,10 @@ const Games = ({ navigation }) => {
 	}, []);
 
 	const onRefresh = useCallback(async () => {
-		// console.log('Refreshing...');
 		setRefreshing(true);
 		try {
 			setLoading(true);
 			await getAllTypes();
-			// console.log('Good');
 			setLoading(false);
 			setRefreshing(false);
 		} catch (error) {
@@ -108,7 +106,6 @@ const styles = StyleSheet.create({
 		padding: 10,
 	},
 	container: {
-		// paddingBottom: 0,
 		height: '100%',
 	},
 	titleBlock: {
@@ -119,7 +116,6 @@ const styles = StyleSheet.create({
 	block: {
 		display: 'flex',
 		flexDirection: 'row',
-		// backgroundColor: '#FAE0D8',
 		borderRadius: 30,
 		marginBottom: 10,
 		padding: 5,

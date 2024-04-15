@@ -1,7 +1,7 @@
 import React from 'react';
-import { Image, Linking, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleInfo, faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 
 const AboutApplication = () => {
 
@@ -59,9 +59,6 @@ const styles = StyleSheet.create({
 	container: {
 		margin: 10,
 	},
-	text: {
-
-	},
 	iconBlock: {
 		display: 'flex',
 		alignItems: 'center',
@@ -81,7 +78,6 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		gap: 10,
 		paddingTop: 20,
-
 	},
 	itemCategories: {
 		display: 'flex',
@@ -89,14 +85,17 @@ const styles = StyleSheet.create({
 		gap: 10,
 		alignItems: 'center',
 	},
-	itemImage: {},
+	itemImage: {
+	},
 	titemText: {
-		fontSize: 15,
+		fontSize: 16,
+		flex: 1,
 		textAlign: 'justify',
 	},
 	itemTextTitle: {
 		fontWeight: '900',
 		color: '#8d6349ac',
+		
 	},
 });
 

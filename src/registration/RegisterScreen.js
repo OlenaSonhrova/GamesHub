@@ -17,18 +17,9 @@ const RegisterScreen = ({ navigation }) => {
 
 
 	const handleSubmitButton = async () => {
-		if (!userName) {
-			alert('Please fill Name');
-			return;
-		};
-		if (!userEmail) {
-			alert('Please fill Email');
-			return;
-		};
-		if (!userPassword) {
-			alert('Please fill Password');
-			return;
-		};
+		if (!userName) { alert('Please fill Name'); return; };
+		if (!userEmail) { alert('Please fill Email'); return; };
+		if (!userPassword) { alert('Please fill Password'); return; };
 		setLoading(true);
 		try {
 			setUserName(' ');
@@ -49,11 +40,10 @@ const RegisterScreen = ({ navigation }) => {
 			});
 			const json = await response.json();
 			setLoading(false);
-			console.log(json?.status);
 			navigation.replace('PrivacyPolicy');
 		} catch (error) {
-			console.log(error);
-			console.log('Problem');
+			console.error(error);
+			alert('Opssss.', error);
 			setLoading(false);
 		};
 	};

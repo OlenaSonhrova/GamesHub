@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CreateUserGame, GetAllGameDurations, GetAllGameLocations, GetAllGameTypes, GetAllMoneyRanges, GetAllPlayerAges, GetAllPlayerCounts, UpdateUserGame } from '../../api/api';
+import Loader from '../../registration/components/loader';
 
 
 const type = ["TeamBuilding", "Криголами", "Челенджі", "IQ", "Естафети", "Загальнотабірні", "Інші"];
@@ -29,6 +30,8 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 	const [selectedLocation, setSelectedLocation] = useState('');
 	const [selectedMoney, setSelectedMoney] = useState('');
 
+	const [loading, setLoading] = useState(false);
+
 	const today = new Date();
 	const year = today.getFullYear();
 	const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -52,268 +55,66 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 	}, [upDate, details, gameIdForUpDAteInfa]);
 
 	const getDataInfa = async () => {
+		setLoading(true);
 		try {
-			const id = await AsyncStorage.getItem('user_id');
-			const urlType = ('http://176.36.224.228:24242/api_v1/getAllGameTypes?' + new URLSearchParams({ user_id: id }));
-			const urlLocation = ('http://176.36.224.228:24242/api_v1/getAllGameLocations?' + new URLSearchParams({ user_id: id }));
-			const urlAge = ('http://176.36.224.228:24242/api_v1/getAllPlayerAges?' + new URLSearchParams({ user_id: id }));
-			const urlMoney = ('http://176.36.224.228:24242/api_v1/getAllMoneyRanges?' + new URLSearchParams({ user_id: id }));
-			const urlDuration = ('http://176.36.224.228:24242/api_v1/getAllGameDurations?' + new URLSearchParams({ user_id: id }));
-			const urlCountPlayers = ('http://176.36.224.228:24242/api_v1/getAllPlayerCounts?' + new URLSearchParams({ user_id: id }));
+			const type = await GetAllGameTypes();
+			const typeName = type.map(item => item.name);
 
-			const responseType = await fetch(urlType);
-			const responseLocation = await fetch(urlLocation);
-			const responseAge = await fetch(urlAge);
-			const responseMoney = await fetch(urlMoney);
-			const responseDuration = await fetch(urlDuration);
-			const responseCountPlayers = await fetch(urlCountPlayers);
+			const location = await GetAllGameLocations();
+			const age = await GetAllPlayerAges();
+			const count = await GetAllPlayerCounts();
+			const money = await GetAllMoneyRanges();
+			const duration = await GetAllGameDurations();
 
-			const jsonType = await responseType.json();
-			const jsonLocation = await responseLocation.json();
-			const jsonAge = await responseAge.json();
-			const jsonMoney = await responseMoney.json();
-			const jsonDuration = await responseDuration.json();
-			const jsonCountPlayers = await responseCountPlayers.json();
+			setNewType(typeName);
+			setNewLocation(location);
+			setNewAge(age);
+			setNewCountPlayers(count);
+			setNewMoney(money);
+			setNewDuration(duration);
 
-			const newArrType = [...newType];
-			for (let i = 0; i < jsonType?.types.length; i++) {
-				newArrType[i] = jsonType?.types[i];
-			};
-			setNewType(newArrType);
-
-			const newArrLocation = [...newLocation];
-			for (let i = 0; i < jsonLocation?.locations.length; i++) {
-				newArrLocation[i] = jsonLocation?.locations[i];
-			};
-			setNewLocation(newArrLocation);
-
-			const newArrAge = [...newAge];
-			for (let i = 0; i < jsonAge?.ages.length; i++) {
-				newArrAge[i] = jsonAge?.ages[i];
-			};
-			setNewAge(newArrAge);
-
-			const newArrMoney = [...newMoney];
-			for (let i = 0; i < jsonMoney?.ranges.length; i++) {
-				newArrMoney[i] = jsonMoney?.ranges[i];
-			};
-			setNewMoney(newArrMoney);
-
-			const newArrDuration = [...newDuration];
-			for (let i = 0; i < jsonDuration?.durations.length; i++) {
-				newArrDuration[i] = jsonDuration?.durations[i];
-			};
-			setNewDuration(newArrDuration);
-
-			const newArrCountPlayers = [...newCountPlayers];
-			for (let i = 0; i < jsonCountPlayers?.counts.length; i++) {
-				newArrCountPlayers[i] = jsonCountPlayers?.counts[i];
-			};
-			setNewCountPlayers(newArrCountPlayers);
-
+			setLoading(false);
 		} catch (error) {
+			setLoading(false);
 			console.error(error);
 		};
 	};
+
+
 
 	useEffect(() => {
 		getDataInfa();
 	}, []);
 
-	const pressDuration = (item) => {
-		console.log(item);
-		setSelectedDuration(item);
-	};
-
-	const pressType = (item) => {
-		console.log(item);
-		setSelectedType(item);
-	};
-
-	const pressCountPlayers = (item) => {
-		console.log(item);
-		setSelectedCountPlayers(item);
-	};
-
-	const pressAge = (item) => {
-		console.log(item);
-		setSelectedAge(item);
-	};
-
-	const pressLocation = (item) => {
-		console.log(item);
-		setSelectedLocation(item);
-	};
-
-	const pressMoney = (item) => {
-		console.log(item);
-		setSelectedMoney(item);
-	};
 
 	const addGame = async () => {
-		if (!name) {
-			alert('Будь ласка, напишіть назву гри');
-			return;
-		}
-		if (!props) {
-			alert('Будь ласка, напишить реквізит');
-			return;
-		}
-		if (!description) {
-			alert('Будь ласка, напишить основне завдання ');
-			return;
-		}
-		if (!selectedType) {
-			alert('Будь ласка, оберіть категорію');
-			return;
-		}
-		if (!selectedDuration) {
-			alert('Будь ласка, оберіть тривалість гри');
-			return;
-		}
-		if (!selectedCountPlayers) {
-			alert('Будь ласка, оберіть кількість учасників');
-			return;
-		}
-		if (!selectedAge) {
-			alert('Будь ласка, оберіть вік учасників');
-			return;
-		}
-		if (!selectedLocation) {
-			alert('Будь ласка, оберіть локацію');
-			return;
-		}
-		if (!selectedMoney) {
-			alert('Будь ласка, оберіть кількість необхідних фінансів');
-			return;
-		}
-		
-		const dataToSend = "відповідь, щоб закрилось вікно додавання гри";
+		if (!name) { alert('Будь ласка, напишіть назву гри'); return; };
+		if (!props) { alert('Будь ласка, напишить реквізит'); return; };
+		if (!description) { alert('Будь ласка, напишить основне завдання '); return; };
+		if (!selectedType) { alert('Будь ласка, оберіть категорію'); return; };
+		if (!selectedDuration) { alert('Будь ласка, оберіть тривалість гри'); return; };
+		if (!selectedCountPlayers) { alert('Будь ласка, оберіть кількість учасників'); return; };
+		if (!selectedAge) { alert('Будь ласка, оберіть вік учасників'); return; };
+		if (!selectedLocation) { alert('Будь ласка, оберіть локацію'); return; };
+		if (!selectedMoney) { alert('Будь ласка, оберіть кількість необхідних фінансів'); return; };
+
+		const dataToSend = "close window";
 		onDataSubmit(dataToSend);
 
 		if (upDate) {
-			try {
-				const url = "http://176.36.224.228:24242/api_v1/updateUserGame";
-				const idUser = await AsyncStorage.getItem('user_id');
-				// console.log(idUser);
-				const response = await fetch(url, {
-					method: 'POST',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						name: name,
-						type: selectedType,
-						props: props,
-						description: description,
-						duration_sec: selectedDuration,
-						count_players: selectedCountPlayers,
-						age: selectedAge,
-						location: selectedLocation,
-						money: selectedMoney,
-						game_id: gameIdForUpDAteInfa,
-						user_id: idUser,
-						user_rating: 0,
-					}),
-				});
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				const json = await response.json();
-				if (json?.status === 'ERROR') {
-					alert(json?.error);
-					return;
-				};
-				const dataToSend = {
-					name: name,
-					type: selectedType,
-					props: props,
-					description: description,
-					duration_sec: selectedDuration,
-					count_players: selectedCountPlayers,
-					age: selectedAge,
-					location: selectedLocation,
-					money: selectedMoney,
-					game_id: gameIdForUpDAteInfa,
-					user_id: idUser,
-					user_rating: 0,
-				};
-				onDataSubmit(dataToSend);
-				// console.log(json?.status);
-				// console.log(json?.error);
-				// console.log(json?.data);
-			} catch (error) {
-				console.error(error);
-				console.log(error.message);
-			};
+			const upDateGame = await UpdateUserGame(name, selectedType, props, description, selectedDuration, selectedCountPlayers, selectedAge, selectedLocation, selectedMoney, gameIdForUpDAteInfa);
+			onDataSubmit(upDateGame);
+
 		} else {
-		// console.log('Start test');
-		// for (let index = 0; index < 300; index++) {
-		// }
-			// console.log('Finish');
-		try {
-				const url = "http://176.36.224.228:24242/api_v1/createUserGame";
-				const idUser = await AsyncStorage.getItem('user_id');
-				const response = await fetch(url, {
-					method: 'POST',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						name: name,
-						type: selectedType,
-						user_rating: 0,
-						props: props,
-						description: description,
-						duration_sec: selectedDuration,
-						count_players: selectedCountPlayers,
-						age: selectedAge,
-						location: selectedLocation,
-						money: selectedMoney,
-						user_id: idUser,
-					}),
-				});
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				const json = await response.json();
-				if (json?.status === 'ERROR') {
-					alert(json?.error);
-					return;
-				};
-				const dataToSend = {
-					name: name,
-					type: selectedType,
-					user_rating: 0,
-					props: props,
-					description: description,
-					duration_sec: selectedDuration,
-					count_players: selectedCountPlayers,
-					age: selectedAge,
-					location: selectedLocation,
-					money: selectedMoney,
-					user_id: idUser,
-					creation_date: formattedDate,
-					game_id: json?.data?.game_id,
-				};
-				onDataSubmit(dataToSend);				
-				// console.log(json);
-				// console.log(json?.status);
-				// console.log(json?.data);
-			} catch (error) {
-				console.log(json?.status);
-				console.error(error);
-				console.log(error.message);
-			};
+			const createGame = await CreateUserGame(name, selectedType, props, description, selectedDuration, selectedCountPlayers, selectedAge, selectedLocation, selectedMoney, formattedDate);
+			onDataSubmit(createGame);
 		};
 	};
 
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<ScrollView
+			{loading ? <Loader /> : <ScrollView
 				keyboardShouldPersistTaps="always"
 				keyboardDismissMode="on-drag"
 				style={styles.inputContainer}
@@ -344,9 +145,9 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					/>
 					<Text style={styles.valueText}>Категорія:</Text>
 					<View style={styles.block}>
-						{newType.map((type) => {
+						{newType.map((type, index) => {
 							return (
-								<Pressable key={type} style={{ backgroundColor: selectedType === type ? '#B66A53' : '#FAE2D4' }} onPress={() => pressType(type)}>
+								<Pressable key={index} style={{ backgroundColor: selectedType === type ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedType(type) }}>
 									<View>
 										<Text style={styles.blockText}>{type}</Text>
 									</View>
@@ -356,9 +157,9 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Тривалість гри:</Text>
 					<View style={styles.block}>
-						{newDuration.map((duration) => {
+						{newDuration.map((duration, index) => {
 							return (
-								<Pressable key={duration} style={{ backgroundColor: selectedDuration === duration ? '#B66A53' : '#FAE2D4' }} onPress={() => pressDuration(duration)}>
+								<Pressable key={index} style={{ backgroundColor: selectedDuration === duration ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedDuration(duration) }}>
 									<View>
 										<Text style={styles.blockText}>{duration} хв.</Text>
 									</View>
@@ -368,9 +169,9 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Кількість учасників:</Text>
 					<View style={styles.block}>
-						{newCountPlayers.map((countPlayers) => {
+						{newCountPlayers.map((countPlayers, index) => {
 							return (
-								<Pressable key={countPlayers} style={{ backgroundColor: selectedCountPlayers === countPlayers ? '#B66A53' : '#FAE2D4' }} onPress={() => pressCountPlayers(countPlayers)}>
+								<Pressable key={index} style={{ backgroundColor: selectedCountPlayers === countPlayers ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedCountPlayers(countPlayers) }}>
 									<View>
 										<Text style={styles.blockText}>{countPlayers}</Text>
 									</View>
@@ -380,9 +181,9 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Вік (років):</Text>
 					<View style={styles.block}>
-						{newAge.map((age) => {
+						{newAge.map((age, index) => {
 							return (
-								<Pressable key={age} style={{ backgroundColor: selectedAge === age ? '#B66A53' : '#FAE2D4' }} onPress={() => pressAge(age)}>
+								<Pressable key={index} style={{ backgroundColor: selectedAge === age ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedAge(age) }}>
 									<View>
 										<Text style={styles.blockText}>{age}</Text>
 									</View>
@@ -392,9 +193,9 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Локація:</Text>
 					<View style={styles.block}>
-						{newLocation.map((location) => {
+						{newLocation.map((location, index) => {
 							return (
-								<Pressable key={location} style={{ backgroundColor: selectedLocation === location ? '#B66A53' : '#FAE2D4' }} onPress={() => pressLocation(location)}>
+								<Pressable key={index} style={{ backgroundColor: selectedLocation === location ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedLocation(location) }}>
 									<View>
 										<Text style={styles.blockText}>{location}</Text>
 									</View>
@@ -404,9 +205,9 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Фінанси (грн):</Text>
 					<View style={styles.block}>
-						{newMoney.map((money) => {
+						{newMoney.map((money, index) => {
 							return (
-								<Pressable key={money} style={{ backgroundColor: selectedMoney === money ? '#B66A53' : '#FAE2D4' }} onPress={() => pressMoney(money)}>
+								<Pressable key={index} style={{ backgroundColor: selectedMoney === money ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedMoney(money) }}>
 									<View>
 										<Text style={styles.blockText}>{money}</Text>
 									</View>
@@ -416,11 +217,12 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<View style={styles.buttonCenter}>
 						<Pressable onPress={addGame} style={styles.button}>
-							<Text style={styles.buttonText}>Save</Text>
+							<Text style={styles.buttonText}>Зберегти</Text>
 						</Pressable>
 					</View>
 				</View>
-			</ScrollView>
+			</ScrollView>}
+
 		</SafeAreaView>
 	);
 };

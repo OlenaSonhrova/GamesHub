@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Image, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import RatingGame from '../commons/raiting';
 import Loader from '../../registration/components/loader';
+import { GetUserSelectedGames, RemoveSelectedGame } from '../../api/api';
 
 
 
@@ -19,57 +19,29 @@ const Likedd = () => {
 	const [refreshing, setRefreshing] = useState(false);
 
 
-	const getUserSelectedGames = useCallback(async () => {
-		setLoading(true);
-		try {
-			const id = await AsyncStorage.getItem('user_id');
-			const url = ('http://176.36.224.228:24242/api_v1/getUserSelectedGames?' + new URLSearchParams({ user_id: id }));
-			const response = await fetch(url);
-			const json = await response.json();
-			// console.log(json);
-			setData(json?.games);
-			setLoading(false);
-		} catch (error) {
-			console.error(error);
-			console.log(error.message);
+	useEffect(() => {
+		const fetchData = async () => {
+			setLoading(true);
+			const response = await GetUserSelectedGames();
+			setData(response);
 			setLoading(false);
 		}
+		fetchData();
 	}, []);
 
-	useEffect(() => {
-		getUserSelectedGames();
-	}, [getUserSelectedGames]);
-
-
-	const onRefresh = useCallback(() => {
+	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
-		getUserSelectedGames();
+		const response = await GetUserSelectedGames();
+		setData(response);
 		setRefreshing(false);
-	}, [getUserSelectedGames]);
+	}, [setData]);
 
 
-	const setSelectedGame = async (idGame) => {
+	const removeSelectedGame = async (idGame) => {
 		setData(data.filter((item) => item.game_id !== idGame));
-		const url = "http://176.36.224.228:24242/api_v1/removeSelectedGame";
-		const idUser = await AsyncStorage.getItem('user_id');
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				user_id: idUser,
-				game_id: idGame,
-			}),
-		});
-		const json = await response.json();
-		if (json?.status === 'SUCCESS') {
-			console.log(json?.status)
-		} else {
-			console.log('Incorrect remove game in select game');;
-		}
+		const response = await RemoveSelectedGame(idGame);
 	};
+
 
 	return (
 		<View style={styles.center}>
@@ -101,7 +73,7 @@ const Likedd = () => {
 								</View>
 							</View>
 							<View>
-								<Pressable onPress={() => setSelectedGame(item.game_id)}>
+								<Pressable onPress={() => removeSelectedGame(item.game_id)}>
 									<FontAwesomeIcon icon={faHeart} size={30} color='red' />
 								</Pressable>
 							</View>
@@ -215,8 +187,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#EEC9B0',
 		height: '100%',
 	},
-	head: {
-	},
 	arrowLeft: {
 		padding: 10,
 	},
@@ -258,10 +228,6 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		gap: 30,
 		height: '62%',
-	},
-	paddingBottom: {
-	},
-	bodyInfaItem: {
 	},
 	bodyInfaTitle: {
 		fontSize: 34,

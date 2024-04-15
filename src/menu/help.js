@@ -4,7 +4,6 @@ import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
 
 const Help = ({navigation}) => {
 
-	
 
 	const onPtressUrl = (index) => {
 		if (index === 1) {
@@ -51,9 +50,6 @@ const Help = ({navigation}) => {
 const styles = StyleSheet.create({
 	container: {
 		margin: 10,
-	},
-	textBlock: {
-
 	},
 	iconBlock: {
 		display: 'flex',

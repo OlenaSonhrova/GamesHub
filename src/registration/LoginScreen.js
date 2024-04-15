@@ -15,21 +15,13 @@ const LoginScreen = ({ navigation }) => {
 	const passwordInputRef = createRef();
 
 	const handleSubmitPress = async () => {
-		if (!userEmail) {
-			alert('Будь ласка, заповніть Email');
-			return;
-		};
-		if (!userPassword) {
-			alert('Будь ласка, заповніть Password');
-			return;
-		};
+		if (!userEmail) { alert('Будь ласка, заповніть Email'); return; };
+		if (!userPassword) { alert('Будь ласка, заповніть Password'); return; };
 		setLoading(true);
 		const response = await LoginUser(userEmail, userPassword);
-		console.log('Response in login', response);
-		setLoading(false);
 		if (response?.status === "ERROR") {
-			alert(`Не правильний Password або Email in FUNCTION\n${response?.error}`);
 			setLoading(false);
+			alert(`Не правильний Password або Email in FUNCTION\n${response?.error}`);
 			navigation.replace('LoginScreen');
 			setUserEmail(' ');
 			setUserPassword(' ');

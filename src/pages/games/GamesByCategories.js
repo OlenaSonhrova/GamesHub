@@ -42,14 +42,10 @@ const GamesByCategories = ({ route }) => {
 		}
 	}, []);
 
-	const handleSelectedGameChange = (selectedGames) => {
-		setData(selectedGames);
-	};
-
 
 	return (
 		<View style={styles.block}>
-			{loading ? <Loader /> : <FlatListComponent data={data} refreshing={refreshing} onRefresh={onRefresh} image={image} handleSelectedGameChange={handleSelectedGameChange}/>}
+			{loading ? <Loader /> : <FlatListComponent data={data} refreshing={refreshing} onRefresh={onRefresh} image={image} />}
 		</View>
 	);
 };

@@ -13,6 +13,7 @@ import PrivacyPolicy from './src/registration/PrivacyPolicy';
 const Stack = createStackNavigator();
 
 const Auth = () => {
+
 	return (
 		<Stack.Navigator initialRouteName="LoginScreen">
 			<Stack.Screen
@@ -24,13 +25,13 @@ const Auth = () => {
 				name="RegisterScreen"
 				component={RegisterScreen}
 				options={{
-					title: 'Register', //Set Header Title
+					title: 'Register',
 					headerStyle: {
-						backgroundColor: '#DDA394', //Set Header color
+						backgroundColor: '#DDA394',
 					},
-					headerTintColor: '#fff', //Set Header text color
+					headerTintColor: '#fff',
 					headerTitleStyle: {
-						fontWeight: 'bold', //Set Header text style
+						fontWeight: 'bold',
 					},
 				}}
 			/>
@@ -51,7 +52,6 @@ function App() {
 						<Stack.Screen
 							name="SplashScreen"
 							component={SplashScreen}
-							// Hiding header for Splash Screen
 							options={{ headerShown: false }}
 						/>
 						<Stack.Screen
@@ -62,11 +62,9 @@ function App() {
 						<Stack.Screen
 							name="DrawerNavigator"
 							component={DrawerNavigator}
-							// Hiding header for Navigation Drawer
 							options={{ headerShown: false }}
 						/>
 					</Stack.Navigator>
-					{/* <DrawerNavigator /> */}
 				</NavigationContainer>
 
 	);

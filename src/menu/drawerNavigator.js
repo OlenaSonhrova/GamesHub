@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
-import { DrawerContentScrollView, DrawerItem, DrawerItemList, createDrawerNavigator, useDrawerStatus } from "@react-navigation/drawer";
+import { DrawerContentScrollView, DrawerItem, DrawerItemList, createDrawerNavigator } from "@react-navigation/drawer";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleQuestion, faArrowLeft, faHandshakeSimple, faCircleInfo, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,6 +10,7 @@ import BottomTabNavigator from "../pages/commons/TabNavigation";
 import Help from "./help";
 import AboutApplication from "./aboutApplication";
 import UserAgreement from "./userAgreement";
+import { GetUserInfo } from "../api/api";
 
 
 
@@ -17,18 +18,11 @@ const CustomSidebarMenu = (props) => {
 	const [data, setData] = useState({});
 
 	useEffect(() => {
-		const getUserInfo = async () => {
-			const id = await AsyncStorage.getItem('user_id');
-			const url = ('http://176.36.224.228:24242/api_v1/getUserInfo?' + new URLSearchParams({ user_id: id }).toString());
-			try {
-				const response = await fetch(url);
-				const json = await response.json();
-				setData(json);
-			} catch (error) {
-				console.error(error);
-			}
-		};
-		getUserInfo();
+		const fetchData = async () => {
+			const infaUser = await GetUserInfo();
+			setData(infaUser);
+		}
+		fetchData();
 	}, []);
 
 	return (
@@ -90,10 +84,10 @@ const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
 
 	return (
-		<Drawer.Navigator 
-		screenOptions={{
-			drawerType: 'back',
-		}} drawerContent={props => <CustomSidebarMenu {...props} />}
+		<Drawer.Navigator
+			screenOptions={{
+				drawerType: 'back',
+			}} drawerContent={props => <CustomSidebarMenu {...props} />}
 		>
 			<Drawer.Screen name="Menu" component={BottomTabNavigator}
 				options={{

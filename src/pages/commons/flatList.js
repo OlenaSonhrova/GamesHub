@@ -1,5 +1,5 @@
 
-import React, {useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar, faHeart } from '@fortawesome/free-solid-svg-icons';
@@ -8,11 +8,15 @@ import { faStar, faHeart } from '@fortawesome/free-solid-svg-icons';
 import ModalComponent from './modal';
 import { SelectedGame } from '../../api/api';
 
-const FlatListComponent = ({ data, image, refreshing, onRefresh}) => {
+const FlatListComponent = ({ data, image, refreshing, onRefresh }) => {
 
 	const [gamePressed, setGamePressed] = useState(null);
 	const [newData, setNewData] = useState(data);
-	
+
+	useEffect(() => {
+		setNewData(data);
+	}, [data]);
+
 
 	const setSelectedGameHandler = (game) => {
 		setGamePressed(game);
