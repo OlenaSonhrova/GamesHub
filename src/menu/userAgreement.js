@@ -1,18 +1,20 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import TextPrivacyPolice from '../registration/components/textPrivacyPolice';
 
 const UserAgreement = () => {
 
 	return (
-		<View>
-			<Text style={styles.text}>UserAgreement</Text>
-		</View>
+		<ScrollView style={styles.container}>
+			<TextPrivacyPolice />
+		</ScrollView>
 	);
 };
 
 const styles = StyleSheet.create({
-	text: {
-		
+	container: {
+		padding: 10,
+		marginBottom: 30,
 	},
 });
 
