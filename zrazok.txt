@@ -23,8 +23,7 @@ export default App;
 
 
 
-==========================================
-npm start --- reset cash
+========================================================================================
 
 cd android && ./gradlew assembleRelease
 
@@ -39,7 +38,7 @@ cd android ./gradlew clean
 
 
 [TypeError: Network request failed}
-від http://localhost:3030 до :http://10.0.2.2:3030
+від http://localhost:8081 до :http://10.0.2.2:8081
 
 
 
@@ -108,7 +107,7 @@ https://reactnative.dev/docs/signed-apk-android
 
 
 
-
+==============================================================================================================================
 
 
 щоб додати оптимізацію коду, менше місця теба доадти в файл android/app/build.gradle
@@ -271,3 +270,191 @@ dependencies {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+
+
+============================================================================================================================
+
+import { useEffect, useState } from 'react';
+import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View, Image, RefreshControl } from 'react-native';
+import NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQuery, QueryClient } from '@tanstack/react-query';
+import Loader from '../../registration/components/loader';
+import { GetAllGameTypes } from '../../api/api';
+
+const queryClient = new QueryClient();
+
+const Games = ({ navigation }) => {
+
+
+	const [localData, setLocalData] = useState(null);
+
+	useEffect(() => {
+		const fetchLocalData = async () => {
+			const storedData = await AsyncStorage.getItem('gameTypes');
+			if (storedData) {
+				setLocalData(JSON.parse(storedData));
+			}
+		};
+		fetchLocalData();
+	}, []);
+
+	const { data, isLoading, isError, error, refetch } = useQuery(
+
+		{
+			queryKey: ["getAllGameTypes"],
+			queryFn: GetAllGameTypes,
+			staleTime: 3600000,
+			initialData: localData,
+		}
+	);
+
+	const handleRefresh = async () => {
+		const response = await refetch();
+		if (response?.data == 'AxiosError: Network Error') {
+			queryClient.setQueryData(["getAllGameTypes"], localData);
+		};
+	};
+
+
+	if (isLoading) {
+		return <Loader />;
+	};
+
+
+	if (isError) {
+		alert('return. isError', error);
+		return null;
+	};
+
+	return (
+		<View style={styles.backgroundColor}>
+			<SafeAreaView style={styles.container}>
+				<Text style={styles.titleBlock}>КАТЕГОРІЇ</Text>
+				<FlatList
+					data={localData}
+					refreshControl={
+						<RefreshControl
+							refreshing={isLoading}
+							onRefresh={handleRefresh}
+						/>
+					}
+					renderItem={({ item, index }) => (
+						<Pressable style={({ pressed }) => [
+							{
+								backgroundColor: pressed ? '#FAE2D4' : '#EEC9B0',
+							},
+							styles.block,
+						]} onPress={() => {
+							navigation.navigate('Ігри', {
+								type: item.name,
+							});
+						}}>
+							<View style={styles.blockText}>
+								<Text style={styles.number}>{item.count}</Text>
+								<Text style={styles.text}>{item.name}</Text>
+							</View>
+							{/* <Image style={styles.image} key={index} source={item.src} /> */}
+						</Pressable>
+					)}
+				/>
+			</SafeAreaView>
+		</View>
+	);
+};
+
+const styles = StyleSheet.create({
+	backgroundColor: {
+		backgroundColor: '#FFFAF5',
+		height: '100%',
+		padding: 10,
+	},
+	container: {
+		height: '100%',
+	},
+	titleBlock: {
+		fontSize: 26,
+		textAlign: 'center',
+		fontWeight: '900',
+	},
+	block: {
+		display: 'flex',
+		flexDirection: 'row',
+		borderRadius: 30,
+		marginBottom: 10,
+		padding: 5,
+		paddingLeft: 15,
+		paddingRight: 15,
+		justifyContent: 'space-between',
+		alignItems: 'center',
+	},
+	blockText: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		width: '80%',
+	},
+	number: {
+		fontSize: 26,
+		fontWeight: '600',
+		color: 'black',
+	},
+	text: {
+		fontSize: 24,
+		fontWeight: '600',
+		color: 'black',
+	},
+	image: {
+	},
+});
+
+export default Games;
+
+
+
+
+// if (isError) {
+	// 	handleError();
+	// 	console.log('handleError');
+	// 	alert('handleError');
+	// };
+
+	// useEffect(() => {
+	// 	console.log(isError);
+	// 	if (isError) {
+	// 		handleError();
+	// 		console.log('handleError in useEffect');
+	// 		alert('handleError in useEffect');
+	// 	}
+	// }, [isError]);
+
+
+
+
+
+		const GetAllGameTypes = async () => {
+		try {
+			const id = await AsyncStorage.getItem('user_id');
+			const url = ('http://176.36.224.228:24242/api_v1/getAllGameTypes?' + new URLSearchParams({ user_id: id }));
+			const response = await fetch(url);
+			const data = await response.json();
+			// console.log(data?.types);
+			await AsyncStorage.setItem('gameTypes', JSON.stringify(data?.types));
+			console.log('json.types api')
+			return data?.types;
+		} catch (error) {
+			// alert('Opssss. Internet problems, check your connection. GetAllGameTypes', error.message);
+			console.log('error in api')
+			return error;
+		}
+	};
+
+	const { data, isLoading, isError, refetch } = useQuery(
+		{
+			queryKey: ["getAllGameTypes"],
+			queryFn: GetAllGameTypes,
+			staleTime: 3600000,
+			retry: 2,
+		},
+	);

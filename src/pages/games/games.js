@@ -1,79 +1,86 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View, Image, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQuery } from '@tanstack/react-query';
 import Loader from '../../registration/components/loader';
+import GetAllGamesLocal from '../../localData/localData';
+import { fetchData } from '../../api/api';
 
 
 const Games = ({ navigation }) => {
 
-	const data = [
+	const [localData, setLocalData] = useState([]);
+
+	const { data, isLoading, isError, refetch } = useQuery(
 		{
-			name: "Перевірка",
-			count: 10,
-			src: require('../../image/ice.png'),
-		}
-	];
+			queryKey: ["fetchData"],
+			queryFn: () => fetchData('getAllGameTypes'),
+			staleTime: 3600000,
+			retry: 2,
+		},
+	);
 
-	const [newData, setNewData] = useState(data);
-	const [refreshing, setRefreshing] = useState(false);
-	const [loading, setLoading] = useState(false);
-
-	const addMissingProperty = (obj) => ({
-		...obj,
-		name: obj.name || "Default Type",
-		count: obj.count || 0,
-		src: obj.src || require('../../image/ice.png'),
-	});
-
-	const getAllTypes = async () => {
-		setLoading(true);
-		try {
-			const id = await AsyncStorage.getItem('user_id');
-			const url = ('http://176.36.224.228:24242/api_v1/getAllGameTypes?' + new URLSearchParams({ user_id: id }));
-			// console.log(url);
-			const response = await fetch(url);
-			const json = await response.json();
-			const allType = json?.types
-			// console.log(allType);
-			const newDataServer = allType.map((obj) => addMissingProperty(obj));
-			const updatedData = [...newDataServer];
-			setNewData(updatedData);
-			setLoading(false);
-		} catch (error) {
-			setLoading(false);
-			console.error(error);
-			alert('Opssss.', error);
-		}
+	const handleRefresh = async () => {
+		await refetch();
 	};
 
 	useEffect(() => {
-		getAllTypes();
+		AsyncStorage.getItem('gameTypes').then((storedData) => {
+			const parsedData = JSON.parse(storedData);
+			if (parsedData && parsedData.length > 0) {
+				setLocalData(parsedData);
+			}
+		});
 	}, []);
 
-	const onRefresh = useCallback(async () => {
-		setRefreshing(true);
-		try {
-			setLoading(true);
-			await getAllTypes();
-			setLoading(false);
-			setRefreshing(false);
-		} catch (error) {
-			console.error(error);
-			setRefreshing(false);
-		}
-	}, []);
+
+	if (isLoading) {
+		return <Loader />;
+	};
+	
 
 	return (
 		<View style={styles.backgroundColor}>
 			<SafeAreaView style={styles.container}>
 				<Text style={styles.titleBlock}>КАТЕГОРІЇ</Text>
-				{loading ? <Loader /> : <FlatList
-					data={newData}
-					extraData={refreshing}
+				{/* <GetAllGamesLocal /> */}
+				{isError ? (<View>
+					<Text>Дані показані з кешу. Для відображення актуальної інформації перевірте з'днання з Інтернетом та перезавантажте сторінку</Text>
+					<FlatList
+						data={localData}
+						refreshControl={
+							<RefreshControl
+								refreshing={isLoading}
+								onRefresh={handleRefresh}
+							/>
+						}
+						renderItem={({ item, index }) => (
+							<Pressable style={({ pressed }) => [
+								{
+									backgroundColor: pressed ? '#FAE2D4' : '#EEC9B0',
+								},
+								styles.block,
+							]} onPress={() => {
+								navigation.navigate('Ігри', {
+									type: item.name,
+								});
+							}}>
+								<View style={styles.blockText}>
+									<Text style={styles.number}>{item.count} Local</Text>
+									<Text style={styles.text}>{item.name}</Text>
+								</View>
+								{/* <Image style={styles.image} key={index} source={item.src} /> */}
+							</Pressable>
+						)}
+					/>
+				</View>
+				) : (<FlatList
+					data={data?.types}
 					refreshControl={
 						<RefreshControl
-							refreshing={refreshing}
-							onRefresh={onRefresh} />
+							refreshing={isLoading}
+							onRefresh={handleRefresh}
+						/>
 					}
 					renderItem={({ item, index }) => (
 						<Pressable style={({ pressed }) => [
@@ -87,13 +94,13 @@ const Games = ({ navigation }) => {
 							});
 						}}>
 							<View style={styles.blockText}>
-								<Text style={styles.number}>{item.count}</Text>
+								<Text style={styles.number}>{item.count} Server</Text>
 								<Text style={styles.text}>{item.name}</Text>
 							</View>
-							<Image style={styles.image} key={index} source={item.src} />
+							{/* <Image style={styles.image} key={index} source={item.src} /> */}
 						</Pressable>
 					)}
-				/>}
+				/>)}
 			</SafeAreaView>
 		</View>
 	);

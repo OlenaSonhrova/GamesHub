@@ -5,7 +5,7 @@ import { faHeart, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile,
 
 import RatingGame from '../commons/raiting';
 import Loader from '../../registration/components/loader';
-import { GetUserSelectedGames, RemoveSelectedGame } from '../../api/api';
+import { GetUserSelectedGames, RemoveSelectedGame, fetchData } from '../../api/api';
 
 
 
@@ -20,19 +20,19 @@ const Likedd = () => {
 
 
 	useEffect(() => {
-		const fetchData = async () => {
+		const fetchDataCom = async () => {
 			setLoading(true);
-			const response = await GetUserSelectedGames();
-			setData(response);
+			const response = await fetchData('getUserSelectedGames');
+			setData(response?.games);
 			setLoading(false);
 		}
-		fetchData();
+		fetchDataCom();
 	}, []);
 
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
-		const response = await GetUserSelectedGames();
-		setData(response);
+		const response = await fetchData('getUserSelectedGames');
+		setData(response?.games);
 		setRefreshing(false);
 	}, [setData]);
 

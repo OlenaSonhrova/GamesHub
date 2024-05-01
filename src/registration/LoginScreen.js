@@ -19,14 +19,15 @@ const LoginScreen = ({ navigation }) => {
 		if (!userPassword) { alert('Будь ласка, заповніть Password'); return; };
 		setLoading(true);
 		const response = await LoginUser(userEmail, userPassword);
-		if (response?.status === "ERROR") {
+		if (response?.non_field_errors) {
 			setLoading(false);
-			alert(`Не правильний Password або Email in FUNCTION\n${response?.error}`);
+			alert('Не правильний Password або Email');
 			navigation.replace('LoginScreen');
 			setUserEmail(' ');
 			setUserPassword(' ');
 		} else {
-			await AsyncStorage.setItem('user_id', response?.data?.user_id);
+			await AsyncStorage.setItem('access', response?.access);
+			await AsyncStorage.setItem('refresh', response?.refresh);
 			setLoading(false);
 			navigation.replace('DrawerNavigator');
 		};

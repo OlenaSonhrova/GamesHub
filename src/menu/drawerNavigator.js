@@ -13,32 +13,40 @@ import UserAgreement from "./userAgreement";
 import { GetUserInfo } from "../api/api";
 
 
-
 const CustomSidebarMenu = (props) => {
-	const [data, setData] = useState({});
+
+	const [dataHuk, setDataHuk] = useState();
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const infaUser = await GetUserInfo();
-			setData(infaUser);
-		}
-		fetchData();
+		const fetchLocalData = async () => {
+			const data = await GetUserInfo();
+			const storedData = await AsyncStorage.getItem('userInfo');
+			if (storedData) {
+				setDataHuk(JSON.parse(storedData));
+			};
+			if (data) {
+				setDataHuk(data?.user);
+			};
+		};
+		fetchLocalData();
 	}, []);
+
+
 
 	return (
 		<View style={stylesSidebar.sideMenuContainer}>
 			<View style={stylesSidebar.profileHeader}>
 				<View style={stylesSidebar.profileHeaderPicCircle}>
-					<Text style={{ fontSize: 25, color: '#307ecc' }}>
-						{data?.user?.name.charAt(0)}
+					<Text style={{ fontSize: 40, color: '#307ecc' }}>
+						{dataHuk?.username.charAt(0) || 'Uss'}
 					</Text>
 				</View>
-				<View style={stylesSidebar.profileHeaderText}>
+				<View style={stylesSidebar.profileHeaderTextContainer}>
 					<Text style={stylesSidebar.profileHeaderText}>
-						User:  {data?.user?.name}
+						<Text style={stylesSidebar.profileHeaderTextTitle}>User:  </Text>{dataHuk?.username}
 					</Text>
 					<Text style={stylesSidebar.profileHeaderText}>
-						Email:  {data?.user?.email}
+					<Text style={stylesSidebar.profileHeaderTextTitle}>Email:  </Text>{dataHuk?.email}
 					</Text>
 				</View>
 			</View>
@@ -156,17 +164,24 @@ const stylesSidebar = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
+	profileHeaderTextContainer: {
+		display: 'flex',
+		flexDirection: 'column',
+
+	},
 	profileHeaderText: {
 		color: 'black',
-		alignSelf: 'center',
 		fontSize: 16,
 		paddingHorizontal: 10,
-		fontWeight: 'bold',
+		maxWidth: 190,
 	},
 	profileHeaderLine: {
 		height: 1,
 		marginHorizontal: 20,
 		backgroundColor: 'black',
 		marginTop: 15,
+	},
+	profileHeaderTextTitle: {
+		fontWeight: '900',
 	},
 });

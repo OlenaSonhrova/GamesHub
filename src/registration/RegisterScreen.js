@@ -25,7 +25,7 @@ const RegisterScreen = ({ navigation }) => {
 			setUserName(' ');
 			setUserEmail(' ');
 			setUserPassword(' ');
-			const url = "http://176.36.224.228:24242/api_v1/registerUser";
+			const url = "http://176.36.224.228:25252/api/v2/users/register/";
 			const response = await fetch(url, {
 				method: 'POST',
 				headers: {
@@ -33,7 +33,7 @@ const RegisterScreen = ({ navigation }) => {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					name: userName,
+					username: userName,
 					email: userEmail,
 					password: userPassword,
 				}),
@@ -43,7 +43,7 @@ const RegisterScreen = ({ navigation }) => {
 			navigation.replace('PrivacyPolicy');
 		} catch (error) {
 			console.error(error);
-			alert('Opssss.', error);
+			alert('Opssss. handleSubmitButton', error);
 			setLoading(false);
 		};
 	};

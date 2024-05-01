@@ -1,11 +1,10 @@
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-const LoginUser = async (userEmail, userPassword) => {
-	console.log('In function');
+const accessTokenRefresh = async () => {
 	try {
-		console.log('In function try');
-		const url = "http://176.36.224.228:24242/api_v1/loginUser";
+		const refresh = await AsyncStorage.getItem('refresh');
+		const url = "http://176.36.224.228:25252/api/v2/users/token/refresh/";
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: {
@@ -13,33 +12,95 @@ const LoginUser = async (userEmail, userPassword) => {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				email: userEmail,
+				refresh: refresh,
+			}),
+		});
+		const jsonData = await response.json();
+		return jsonData?.access;
+	} catch (error) {
+		console.error('Error accessTokenRefresh data:', error);
+		return error;
+	};
+};
+
+const fetchData = async (nameUrl) => {
+	const access = await AsyncStorage.getItem('access');
+	const url = `http://176.36.224.228:25252/api/v2/core/${nameUrl}`;
+	try {
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${access}`,
+				'Content-Type': 'application/json'
+			}
+		});
+		const result = await response.json();
+		if (result?.code === 'token_not_valid') {
+			const newAccess  = await accessTokenRefresh();
+			await AsyncStorage.setItem('access', newAccess);
+			return fetchData(nameUrl);
+		}
+		console.log('result in functon fetchData', result);
+		return result;
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		return error;
+	}
+};
+
+const LoginUser = async (userEmail, userPassword) => {
+	try {
+		const url = "http://176.36.224.228:25252/api/v2/users/login/";
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				username: userEmail,
 				password: userPassword,
 			}),
 		});
 		const jsonData = await response.json();
-		console.log(jsonData);
 		return jsonData;
 	} catch (error) {
-		console.log('In function catch', error);
-		// console.log(error);
 		alert(`Не правильний Password або Email in API\n${error}`);
-		// navigation.replace('LoginScreen');
+		return error;
 	};
 };
 
 const GetUserInfo = async () => {
+	const access = await AsyncStorage.getItem('access');
+	console.log(access);
+	const url = "http://176.36.224.228:25252/api/v2/users/info/";
 	try {
-		const id = await AsyncStorage.getItem('user_id');
-		const url = ('http://176.36.224.228:24242/api_v1/getUserInfo?' + new URLSearchParams({ user_id: id }));
-		const response = await fetch(url);
-		const json = await response.json();
-		return json;
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${access}`,
+				'Content-Type': 'application/json'
+			}
+		});
+		const result = await response.json();
+		if (result?.code === 'token_not_valid') {
+			const newAccess  = await accessTokenRefresh();
+			await AsyncStorage.setItem('access', newAccess);
+			return GetUserInfo();
+		}
+		console.log('result in functon GetUserInfo', result);
+		return result;
 	} catch (error) {
-		console.error(error);
-		alert('Opssss.', error);
-	};
+		console.error('Error fetching data:', error);
+		return error;
+	}
 };
+
+
+
+
+
+
 
 const GetAllGames = async (type) => {
 	// console.log('In function getAllGames token');
@@ -52,7 +113,7 @@ const GetAllGames = async (type) => {
 		})
 		.catch(error => {
 			console.error(error);
-			alert('Opssss.', error);
+			alert('Opssss.GetAllGames', error);
 		});
 };
 
@@ -66,7 +127,7 @@ const GetUserSelectedGames = async () => {
 	} catch (error) {
 		console.error(error);
 		console.log(error.message);
-		alert('Opssss.', error);
+		alert('Opssss. GetUserSelectedGames', error);
 	};
 };
 
@@ -81,7 +142,7 @@ const GetUserCreatedGames = async () => {
 	} catch (error) {
 		console.error(error);
 		console.log(error.message);
-		alert('Opssss.', error);
+		alert('Opssss.GetUserCreatedGames', error);
 	};
 };
 
@@ -105,7 +166,7 @@ const SelectedGame = async (idGame, selected) => {
 			console.log(json?.status)
 		} catch (error) {
 			console.log(error);
-			alert('Opssss.', error);
+			alert('Opssss. SelectedGame', error);
 		};
 	} else {
 		try {
@@ -126,7 +187,7 @@ const SelectedGame = async (idGame, selected) => {
 			console.log(json?.status)
 		} catch (error) {
 			console.log(error);
-			alert('Opssss.', error);
+			alert('Opssss. SelectedGame', error);
 		};
 	}
 };
@@ -151,7 +212,7 @@ const SetGameRating = async (rating, idGame) => {
 		// console.log(json);
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss. SetGameRating', error);
 	};
 };
 
@@ -175,7 +236,7 @@ const RemoveSelectedGame = async (idGame) => {
 		// console.log(json);
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss.RemoveSelectedGame', error);
 	}
 };
 
@@ -199,23 +260,26 @@ const DeleteUserGame = async (idGame) => {
 		// console.log(json?.status)
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss.RemoveSelectedGame', error);
 	};
 };
 
-const GetAllGameTypes = async () => {
-	try {
-		const id = await AsyncStorage.getItem('user_id');
-		const url = ('http://176.36.224.228:24242/api_v1/getAllGameTypes?' + new URLSearchParams({ user_id: id }));
-		const response = await fetch(url);
-		const json = await response.json();
-		// console.log(json);
-		return json?.types;
-	} catch (error) {
-		console.error(error);
-		alert('Opssss.', error);
-	};
-};
+// const GetAllGameTypes = async () => {
+// 	try {
+// 		const id = await AsyncStorage.getItem('user_id');
+// 		const url = ('http://176.36.224.228:24242/api_v1/getAllGameTypes?' + new URLSearchParams({ user_id: id }));
+// 		const response = await fetch(url);
+// 		const data = await response.json();
+// 		// console.log(data?.types);
+// 		await AsyncStorage.setItem('gameTypes', JSON.stringify(data?.types));
+// 		console.log('json.types api')
+// 		return data?.types;
+// 	} catch (error) {
+// 		// alert('Opssss. Internet problems, check your connection. GetAllGameTypes', error.message);
+// 		console.log('error in api')
+// 		return error;
+// 	}
+// };
 
 const GetAllGameLocations = async () => {
 	try {
@@ -227,7 +291,7 @@ const GetAllGameLocations = async () => {
 		return json?.locations;
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss.GetAllGameLocations', error);
 	};
 };
 
@@ -241,7 +305,7 @@ const GetAllPlayerAges = async () => {
 		return json?.ages;
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss. GetAllPlayerAges', error);
 	};
 };
 
@@ -255,7 +319,7 @@ const GetAllMoneyRanges = async () => {
 		return json?.ranges;
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss.GetAllMoneyRanges', error);
 	};
 };
 
@@ -269,7 +333,7 @@ const GetAllGameDurations = async () => {
 		return json?.durations;
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss.GetAllGameDurations', error);
 	};
 };
 
@@ -283,7 +347,7 @@ const GetAllPlayerCounts = async () => {
 		return json?.counts;
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss.GetAllPlayerCounts', error);
 	};
 };
 
@@ -335,7 +399,7 @@ const UpdateUserGame = async (name, selectedType, props, description, selectedDu
 		return dataToSend;
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss. UpdateUserGame', error);
 	};
 };
 
@@ -387,13 +451,14 @@ const CreateUserGame = async (name, selectedType, props, description, selectedDu
 		return dataToSend;
 	} catch (error) {
 		console.error(error);
-		alert('Opssss.', error);
+		alert('Opssss. CreateUserGame', error);
 	};
 };
 
 export {
 	GetAllGames,
 	GetUserSelectedGames,
+	fetchData,
 	SelectedGame,
 	SetGameRating,
 	LoginUser,
@@ -401,7 +466,6 @@ export {
 	GetUserCreatedGames,
 	RemoveSelectedGame,
 	DeleteUserGame,
-	GetAllGameTypes,
 	GetAllGameLocations,
 	GetAllPlayerAges,
 	GetAllMoneyRanges,

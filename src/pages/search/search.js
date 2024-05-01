@@ -67,7 +67,7 @@ const Search = () => {
 			setData(json?.games)
 		} catch (error) {
 			console.error(error);
-			alert('Opssss.', error);
+			alert('Opssss.searchGames ', error);
 		};
 	};
 
