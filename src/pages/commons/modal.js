@@ -1,37 +1,28 @@
 import React, { useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile } from '@fortawesome/free-solid-svg-icons';
 
 
-import { SelectedGame } from '../../api/api';
 import RatingGame from './raiting';
 
 
-const ModalComponent = ({ gamePressed, onClose, image }) => {
+const ModalComponent = ({ gamePressed, onClose, setSelectedGame, updateRating }) => {
 
 	const [modalVisible, setModalVisible] = useState(true);
+
 
 	if (!gamePressed) {
 		return null;
 	};
 
-
 	const [selectedHard, setSelectedHard] = useState(gamePressed.is_selected);
-
-	const setSelectedGame = (idGame, selected) => {
-		if (selected) {
-			setSelectedHard(false);
-		} else {
-			setSelectedHard(true);
-		};
-		SelectedGame(idGame, selected);
-	};
 
 	const closeModal = () => {
 		setModalVisible(false);
 		onClose();
 	};
+
 
 
 	return (
@@ -55,14 +46,13 @@ const ModalComponent = ({ gamePressed, onClose, image }) => {
 						</Pressable>
 						<View style={styles.headFlex}>
 							<Text style={styles.headText}>{gamePressed.name}</Text>
-							<Image source={image} />
 							<View>
-								<Pressable onPress={() => setSelectedGame(gamePressed.game_id, selectedHard)}>
+								<Pressable onPress={() => { setSelectedGame(gamePressed.name, gamePressed.is_selected); setSelectedHard(!selectedHard); }}>
 									<FontAwesomeIcon icon={faHeart} size={30} color={selectedHard ? 'red' : 'black'} />
 								</Pressable>
 							</View>
 						</View>
-						<RatingGame idGame={gamePressed.game_id} userRating={gamePressed.user_rating} />
+						<RatingGame idGame={gamePressed.name} userRating={gamePressed.user_rating} updateRating={updateRating}/>
 					</View>
 					<View style={styles.body}>
 						<View style={styles.bodyIcon}>
@@ -76,7 +66,7 @@ const ModalComponent = ({ gamePressed, onClose, image }) => {
 							</View>
 							<View style={styles.bodyIconItem}>
 								<FontAwesomeIcon icon={faFaceSmile} size={30} color='black' />
-								<Text style={styles.bodyIconTextt}>{gamePressed.age} років</Text>
+								<Text style={styles.bodyIconTextt}>{gamePressed.player_age} років</Text>
 							</View>
 							<View style={styles.bodyIconItem}>
 								<FontAwesomeIcon icon={faLocationDot} size={30} color='black' />
@@ -116,12 +106,13 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		alignItems: 'center',
+		paddingBottom: 30,
 	},
 	headText: {
 		fontSize: 34,
 		color: 'black',
 		fontWeight: '700',
-		paddingBottom: 30,
 	},
 	body: {
 		marginTop: 10,

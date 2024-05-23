@@ -3,12 +3,11 @@ import { Rating } from 'react-native-ratings';
 
 import { SetGameRating } from '../../api/api';
 
-const RatingGame = ({ idGame, userRating }) => {
+const RatingGame = ({ idGame, userRating, navigation, updateRating }) => {
 
-
-	const ratingCompleted = (rating) => {
-		console.log("Rating is: " + rating);
-		SetGameRating(rating, idGame);
+	const ratingCompleted = async (rating) => {
+		const respons = await SetGameRating(idGame, rating, navigation);
+		await updateRating(idGame, rating);
 	};
 
 	return (

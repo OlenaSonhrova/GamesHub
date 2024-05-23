@@ -2,6 +2,7 @@ import React, { useState, createRef } from 'react';
 import { StyleSheet, TextInput, View, Text, Image, KeyboardAvoidingView, TouchableOpacity, ScrollView,} from 'react-native';
 
 import Loader from '../registration/components/loader';
+import { Register } from '../api/api';
 
 
 const RegisterScreen = ({ navigation }) => {
@@ -25,20 +26,8 @@ const RegisterScreen = ({ navigation }) => {
 			setUserName(' ');
 			setUserEmail(' ');
 			setUserPassword(' ');
-			const url = "http://176.36.224.228:25252/api/v2/users/register/";
-			const response = await fetch(url, {
-				method: 'POST',
-				headers: {
-					Accept: 'application/json',
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					username: userName,
-					email: userEmail,
-					password: userPassword,
-				}),
-			});
-			const json = await response.json();
+			const response = await Register(userName, userEmail, userPassword);
+			console.log('response in coponent register', response)
 			setLoading(false);
 			navigation.replace('PrivacyPolicy');
 		} catch (error) {

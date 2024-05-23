@@ -1,8 +1,9 @@
-import { Button, Image, Linking, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, Button, Image, Linking, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
+import { useEffect } from 'react';
 
-const Help = ({navigation}) => {
+const Help = ({ navigation }) => {
 
 
 	const onPtressUrl = (index) => {
@@ -14,6 +15,20 @@ const Help = ({navigation}) => {
 			Linking.openURL('https://www.instagram.com/olena_sonhrova?igsh=aXRxcmw4bjc5YThs');
 		};
 	};
+
+	const handleBackPress = () => {
+		navigation.toggleDrawer();
+		return true; // Prevent default back button behavior
+	};
+
+	useEffect(() => {
+		BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+		return () => {
+			BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+		};
+	}, [handleBackPress]);
+
 
 	return (
 		<SafeAreaView style={styles.container}>

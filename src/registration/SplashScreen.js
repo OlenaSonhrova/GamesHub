@@ -9,7 +9,7 @@ const SplashScreen = ({ navigation }) => {
 	useEffect(() => {
 		setTimeout(() => {
 			setAnimating(false);
-			AsyncStorage.getItem('access').then((value) =>
+			AsyncStorage.getItem('refresh').then((value) =>
 				navigation.replace(
 					value === null ? 'Auth' : 'DrawerNavigator'
 				),

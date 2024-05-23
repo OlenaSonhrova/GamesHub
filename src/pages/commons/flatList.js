@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -6,9 +5,9 @@ import { faStar, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 
 import ModalComponent from './modal';
-import { SelectedGame } from '../../api/api';
+import { RemoveSelectedGame, SelectedGame } from '../../api/api';
 
-const FlatListComponent = ({ data, image, refreshing, onRefresh }) => {
+const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation }) => {
 
 	const [gamePressed, setGamePressed] = useState(null);
 	const [newData, setNewData] = useState(data);
@@ -17,7 +16,6 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh }) => {
 		setNewData(data);
 	}, [data]);
 
-
 	const setSelectedGameHandler = (game) => {
 		setGamePressed(game);
 	};
@@ -25,16 +23,27 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh }) => {
 	const setSelectedGame = (idGame, selected) => {
 		if (selected) {
 			const updatedGames = newData.map((game) =>
-				game.game_id === idGame ? { ...game, is_selected: false } : game
+				game.name === idGame ? { ...game, is_selected: false } : game
 			);
 			setNewData(updatedGames);
+			RemoveSelectedGame(idGame, navigation);
 		} else {
 			const updatedGames = newData.map((game) =>
-				game.game_id === idGame ? { ...game, is_selected: true } : game
+				game.name === idGame ? { ...game, is_selected: true } : game
 			);
 			setNewData(updatedGames);
+			SelectedGame(idGame, navigation);
 		};
-		SelectedGame(idGame, selected);
+	};
+
+	const updateRating = (idGame, newRating) => {
+		const updatedData = newData.map((game) => {
+			if (game.name === idGame) {
+				return { ...game, user_rating: newRating };
+			}
+			return game;
+		});
+		setNewData(updatedData);
 	};
 
 
@@ -42,6 +51,7 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh }) => {
 		<View style={styles.center}>
 			<FlatList
 				data={newData}
+				style={{ flex: 1 }}
 				windowSize={10}
 				extraData={refreshing}
 				refreshControl={
@@ -49,8 +59,8 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh }) => {
 						refreshing={refreshing}
 						onRefresh={onRefresh} />
 				}
-				keyExtractor={(item) => item.game_id}
-				renderItem={({ item }) => (
+				keyExtractor={(item) => item.name}
+				renderItem={({ item, index }) => (
 					<View>
 						<Pressable style={({ pressed }) => [
 							{
@@ -59,7 +69,7 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh }) => {
 							styles.block,
 						]} onPress={() => setSelectedGameHandler(item)}>
 							<View>
-								<Image style={styles.image} source={image} />
+								<Image style={styles.image} key={index} source={image ? { uri: image } : require('../../image/search.png')} />
 							</View>
 							<View style={styles.blockText}>
 								<Text style={styles.number}>{item.creation_date}</Text>
@@ -70,7 +80,7 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh }) => {
 								</View>
 							</View>
 							<View>
-								<Pressable onPress={() => setSelectedGame(item.game_id, item.is_selected)}>
+								<Pressable onPress={() => setSelectedGame(item.name, item.is_selected)}>
 									<FontAwesomeIcon icon={faHeart} size={30} color={item.is_selected ? 'red' : ''} />
 								</Pressable>
 							</View>
@@ -82,7 +92,7 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh }) => {
 				)}
 			/>
 			{
-				gamePressed && (<ModalComponent gamePressed={gamePressed} image={image} onClose={() => setGamePressed(null)} />
+				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={() => setGamePressed(null)} setSelectedGame={setSelectedGame} updateRating={updateRating}/>
 				)}
 		</View>
 	);
@@ -96,7 +106,7 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 		display: 'flex',
 		flexDirection: 'row',
-		gap: 20,
+		gap: 10,
 		alignItems: 'center',
 		padding: 5,
 		borderRadius: 7,
@@ -121,22 +131,11 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: 'black',
 	},
-	modalView: {
-		margin: 0,
-		padding: 7,
-		backgroundColor: '#EEC9B0',
-		height: '100%',
-	},
-	bodyInfaTitle: {
-		fontSize: 34,
-		color: '#8D6349',
-		fontWeight: '500',
-		paddingBottom: 5,
-	},
-	bodyInfaText: {
-		fontSize: 18,
-		color: 'black',
-		fontWeight: '400',
+	image: {
+		height: 70,
+		width: 70,
+		margin: 4,
+		marginRight: 10,
 	},
 });
 

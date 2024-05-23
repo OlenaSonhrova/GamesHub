@@ -4,22 +4,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import SelectDropdown from 'react-native-select-dropdown';
 
 import FlatListComponent from '../commons/flatList';
+import { GetAllGameDurations, GetAllGameLocations, GetAllMoneyRanges, GetAllPlayerAges, GetAllPlayerCounts, SearchGames, getAllGameTypes } from '../../api/api';
+import Loader from '../../registration/components/loader';
 
-const type = ["Очистисти вибране", "TeamBuilding", "Криголами", "Челенджі", "IQ", "Естафети", "Загальнотабірні", "Інші"];
-const location = ["Очистисти вибране", "Вулиця", "Спортзал", "Спортивний майданчик", "Приміщення", "Online", "Поле", "Гори", "Ліс", "Море", "Інше"];
-const age = ["Очистисти вибране", "1-4", "5-9", "10-14", "15+", "30+", "1-99"];
-const money = ["Очистисти вибране", "0", "1-50", "50-100", "100-200", "200-500", "500+"];
-const duration = ["Очистисти вибране", "1", "2", "5", "10", "20+"];
-const countPlayers = ['Очистисти вибране', "1-5", "1-10", "10-30", "30+"];
-const rating = ["Очистисти вибране", "більше > 1", "більше > 2", "більше > 3", "більше > 4",];
-
-
-const Search = () => {
+const Search = ({ navigation }) => {
 
 	const [name, setName] = useState(null);
-	const [selectType, setSelectType] = useState(null);
+	const [author, setAuthor] = useState(null);
 	const [props, setProps] = useState(null);
 	const [description, setDescription] = useState(null);
+	const [type, setType] = useState();
+	const [duration, setDuration] = useState();
+	const [countPlayers, setCountPlayers] = useState();
+	const [age, setAge] = useState();
+	const [location, setLocation] = useState();
+	const [money, setMoney] = useState();
+	const rating = ["більше > 1", "більше > 2", "більше > 3", "більше > 4",];
+
+	const [selectType, setSelectType] = useState(null);
 	const [selectDuration, setSelectDuration] = useState(null);
 	const [selectCountPlayers, setSelectCountPlayers] = useState(null);
 	const [selectAge, setSelectAge] = useState(null);
@@ -30,59 +32,80 @@ const Search = () => {
 	const [data, setData] = useState([]);
 	const [refreshing, setRefreshing] = useState(false);
 
-	const image = require('../../image/search.png');
+
+	const getDataInfa = async () => {
+		setRefreshing(true);
+		try {
+			const type = await getAllGameTypes('/core/getAllGameTypes/', navigation);
+			const typeName = type?.types.map(item => item.name);
+
+			const location = await GetAllGameLocations('/core/getAllGameLocations/', navigation);
+			const age = await GetAllPlayerAges('/core/getAllPlayerAges/', navigation);
+			const count = await GetAllPlayerCounts('/core/getAllPlayerCounts/', navigation);
+			const money = await GetAllMoneyRanges('/core/getAllMoneyRanges/', navigation);
+			const duration = await GetAllGameDurations('/core/getAllGameDurations/', navigation);
+			setType(typeName);
+			setLocation(location?.locations);
+			setAge(age?.ages);
+			setCountPlayers(count?.counts);
+			setMoney(money?.ranges);
+			setDuration(duration?.durations);
+
+			setRefreshing(false);
+		} catch (error) {
+			setRefreshing(false);
+			console.error(error);
+		};
+	};
 
 	useEffect(() => {
-		if (selectType || selectDuration || selectCountPlayers || selectAge || selectLocation || selectMoney || name || props || description || selectRating) {
-			searchGames();
-		}
-	}, [selectType, selectDuration, selectCountPlayers, selectAge, selectLocation, selectMoney, name, props, description, selectRating]);
+		getDataInfa();
+	}, []);
+
+	useEffect(() => {
+		setRefreshing(true);
+		const asyncFunction = async () => {
+			await searchGames();
+			setRefreshing(false);
+		};
+		asyncFunction();
+	}, [selectType, selectDuration, selectCountPlayers, selectAge, selectLocation, selectMoney, name, props, description, selectRating, author]);
+
 
 	const searchGames = async () => {
 		try {
 			setData([]);
-			const url = "http://176.36.224.228:24242/api_v1/searchGames";
-			const idUser = await AsyncStorage.getItem('user_id');
-			const response = await fetch(url, {
-				method: 'POST',
-				headers: {
-					Accept: 'application/json',
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					name: name,
-					type: selectType,
-					props: props,
-					description: description,
-					duration_sec: selectDuration,
-					count_players: selectCountPlayers,
-					age: selectAge,
-					location: selectLocation,
-					money: selectMoney,
-					average_rating: selectRating,
-					user_id: idUser,
-				}),
+			const body = JSON.stringify({
+				name: name,
+				props: props,
+				description: description,
+				game_type: selectType,
+				duration_sec: selectDuration,
+				count_players: selectCountPlayers,
+				player_age: selectAge,
+				location: selectLocation,
+				money_range: selectMoney,
+				average_rating: selectRating,
+				author: author,
+				creation_date: null
 			});
-			const json = await response.json();
-			setData(json?.games)
+			const response = await SearchGames(body, navigation);
+			setData(response)
 		} catch (error) {
 			console.error(error);
 			alert('Opssss.searchGames ', error);
 		};
 	};
 
-
-	const onRefresh = useCallback(() => {
+	const onRefresh = async () => {
 		setRefreshing(true);
-		searchGames();
+		await searchGames();
 		setRefreshing(false);
-	}, [searchGames]);
-
-
-	const handleSelectedGameChange = (selectedGames) => {
-		setData(selectedGames);
 	};
 
+	if (refreshing) { 
+		return <Loader />
+	};
 
 	return (
 		<SafeAreaView style={styles.backgroundColor}>
@@ -91,10 +114,9 @@ const Search = () => {
 				<View style={styles.blockCateori}>
 					<SelectDropdown
 						data={type}
+						key={selectType || "defaultKey1"}
 						onSelect={(selectedItem) => {
-							console.log(selectedItem);
-							if (selectedItem === type[0]) {
-								console.log(selectedItem);
+							if (selectedItem === selectType) {
 								setSelectType(null);
 							} else {
 								setSelectType(selectedItem);
@@ -114,9 +136,9 @@ const Search = () => {
 					/>
 					<SelectDropdown
 						data={duration}
+						key={selectDuration || "defaultKey2"}
 						onSelect={(selectedItem) => {
-							console.log(selectedItem);
-							if (selectedItem === duration[0]) {
+							if (selectedItem === selectDuration) {
 								setSelectDuration(null);
 							} else {
 								setSelectDuration(selectedItem);
@@ -136,9 +158,9 @@ const Search = () => {
 					/>
 					<SelectDropdown
 						data={age}
+						key={selectAge || "defaultKey3"}
 						onSelect={(selectedItem) => {
-							console.log(selectedItem);
-							if (selectedItem === age[0]) {
+							if (selectedItem === selectAge) {
 								setSelectAge(null);
 							} else {
 								setSelectAge(selectedItem);
@@ -158,9 +180,9 @@ const Search = () => {
 					/>
 					<SelectDropdown
 						data={location}
+						key={selectLocation || "defaultKey4"}
 						onSelect={(selectedItem) => {
-							console.log(selectedItem);
-							if (selectedItem === location[0]) {
+							if (selectedItem === selectLocation) {
 								setSelectLocation(null);
 							} else {
 								setSelectLocation(selectedItem);
@@ -180,9 +202,9 @@ const Search = () => {
 					/>
 					<SelectDropdown
 						data={money}
+						key={selectMoney || "defaultKey5"}
 						onSelect={(selectedItem) => {
-							console.log(selectedItem);
-							if (selectedItem === money[0]) {
+							if (selectedItem === selectMoney) {
 								setSelectMoney(null);
 							} else {
 								setSelectMoney(selectedItem);
@@ -202,9 +224,9 @@ const Search = () => {
 					/>
 					<SelectDropdown
 						data={rating}
+						key={selectRating || "defaultKey6"}
 						onSelect={(selectedItem) => {
-							console.log(selectedItem);
-							if (selectedItem === rating[0]) {
+							if (selectedItem === selectRating) {
 								setSelectRating(null);
 							} else {
 								setSelectRating(selectedItem);
@@ -224,9 +246,9 @@ const Search = () => {
 					/>
 					<SelectDropdown
 						data={countPlayers}
+						key={selectCountPlayers || "defaultKey7"}
 						onSelect={(selectedItem) => {
-							console.log(selectedItem);
-							if (selectedItem === countPlayers[0]) {
+							if (selectedItem === selectCountPlayers) {
 								setSelectCountPlayers(null);
 							} else {
 								setSelectCountPlayers(selectedItem);
@@ -249,26 +271,34 @@ const Search = () => {
 					style={styles.input}
 					placeholder="Назва гри"
 					keyboardType="default"
-					onChangeText={text => setName(text)}
+					onChangeText={text => text === "" ? setName(null) : setName(text)}
 					value={name}
 				/>
 				<TextInput
 					style={styles.input}
 					placeholder="Реквізит"
 					keyboardType="default"
-					onChangeText={text => setProps(text)}
+					onChangeText={text => text === "" ? setProps(null) : setProps(text)}
 					value={props}
 				/>
 				<TextInput
 					style={styles.input}
 					placeholder="Основне завдання"
 					keyboardType="default"
-					onChangeText={text => setDescription(text)}
+					onChangeText={text => text === "" ? setDescription(null) : setDescription(text)}
 					value={description}
+				/>
+				<TextInput
+					style={styles.input}
+					placeholder="Автор гри"
+					keyboardType="default"
+					onChangeText={text => text === "" ? setAuthor(null) : setAuthor(text)}
+					value={author}
 				/>
 			</View>
 			<View style={styles.responce}>
-				<FlatListComponent data={data} refreshing={refreshing} onRefresh={onRefresh} image={image} handleSelectedGameChange={handleSelectedGameChange} />
+				<FlatListComponent data={data} refreshing={refreshing} onRefresh={onRefresh} />
+				<Text>JSFvkdfv ksjvb</Text>
 			</View>
 		</SafeAreaView>
 	);
@@ -278,6 +308,9 @@ const styles = StyleSheet.create({
 	backgroundColor: {
 		height: '100%',
 		margin: 10,
+	},
+	responce: {
+		height: '50%',
 	},
 	blockCateori: {
 		display: 'flex',

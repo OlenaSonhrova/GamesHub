@@ -11,6 +11,7 @@ import { SearchStackNavigator, GamesStackNavigator, Liked, MyGames } from "./sta
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
+	
 	return (
 		<Tab.Navigator initialRouteName="HomeTab"
 			screenOptions={{

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { CreateUserGame, GetAllGameDurations, GetAllGameLocations, GetAllGameTypes, GetAllMoneyRanges, GetAllPlayerAges, GetAllPlayerCounts, UpdateUserGame } from '../../api/api';
+import { CreateUserGame, GetAllGameDurations, GetAllGameLocations, getAllGameTypes, GetAllMoneyRanges, GetAllPlayerAges, GetAllPlayerCounts, UpdateUserGame } from '../../api/api';
 import Loader from '../../registration/components/loader';
 
 
@@ -57,7 +57,7 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 	const getDataInfa = async () => {
 		setLoading(true);
 		try {
-			const type = await GetAllGameTypes();
+			const type = await getAllGameTypes();
 			const typeName = type.map(item => item.name);
 
 			const location = await GetAllGameLocations();
@@ -79,8 +79,6 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 			console.error(error);
 		};
 	};
-
-
 
 	useEffect(() => {
 		getDataInfa();

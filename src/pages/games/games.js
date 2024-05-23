@@ -3,19 +3,27 @@ import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View, Image, Refre
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery } from '@tanstack/react-query';
 import Loader from '../../registration/components/loader';
-import GetAllGamesLocal from '../../localData/localData';
-import { fetchData } from '../../api/api';
+import { getAllGameTypes } from '../../api/api';
+import LocalStorage from '../../Localstorege/LocalStorege';
 
 
 const Games = ({ navigation }) => {
 
 	const [localData, setLocalData] = useState([]);
 
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await AsyncStorage.getItem('AllTypes');
+			const allGameTypes = JSON.parse(response);
+			setLocalData(allGameTypes);
+		};
+		fetchData();
+	}, []);
+
 	const { data, isLoading, isError, refetch } = useQuery(
 		{
-			queryKey: ["fetchData"],
-			queryFn: () => fetchData('getAllGameTypes'),
-			staleTime: 3600000,
+			queryKey: ["getAllGameTypes"],
+			queryFn: () => getAllGameTypes('/core/getAllGameTypes/', navigation),
 			retry: 2,
 		},
 	);
@@ -24,30 +32,19 @@ const Games = ({ navigation }) => {
 		await refetch();
 	};
 
-	useEffect(() => {
-		AsyncStorage.getItem('gameTypes').then((storedData) => {
-			const parsedData = JSON.parse(storedData);
-			if (parsedData && parsedData.length > 0) {
-				setLocalData(parsedData);
-			}
-		});
-	}, []);
-
-
 	if (isLoading) {
 		return <Loader />;
 	};
-	
 
-	return (
-		<View style={styles.backgroundColor}>
-			<SafeAreaView style={styles.container}>
-				<Text style={styles.titleBlock}>КАТЕГОРІЇ</Text>
-				{/* <GetAllGamesLocal /> */}
-				{isError ? (<View>
-					<Text>Дані показані з кешу. Для відображення актуальної інформації перевірте з'днання з Інтернетом та перезавантажте сторінку</Text>
+
+	if (isError) {
+		return (
+			<View style={styles.backgroundColor}>
+				<SafeAreaView style={styles.container}>
+					<Text style={styles.titleBlock}>КАТЕГОРІЇ</Text>
+					<Text style={{paddingBottom: 10}}>Дані показані з кешу. Перевірте з'днання з Інтернетом</Text>
 					<FlatList
-						data={localData}
+						data={localData?.types}
 						refreshControl={
 							<RefreshControl
 								refreshing={isLoading}
@@ -66,15 +63,24 @@ const Games = ({ navigation }) => {
 								});
 							}}>
 								<View style={styles.blockText}>
-									<Text style={styles.number}>{item.count} Local</Text>
+									<Text style={styles.number}>{item.count} Lock</Text>
 									<Text style={styles.text}>{item.name}</Text>
 								</View>
-								{/* <Image style={styles.image} key={index} source={item.src} /> */}
+								<Image style={styles.image} key={index} source={{ uri: item.icon }} />
 							</Pressable>
 						)}
 					/>
-				</View>
-				) : (<FlatList
+				</SafeAreaView>
+			</View>
+		);
+	};
+
+
+	return (
+		<View style={styles.backgroundColor}>
+			<SafeAreaView style={styles.container}>
+				<Text style={styles.titleBlock}>КАТЕГОРІЇ</Text>
+				<FlatList
 					data={data?.types}
 					refreshControl={
 						<RefreshControl
@@ -91,16 +97,18 @@ const Games = ({ navigation }) => {
 						]} onPress={() => {
 							navigation.navigate('Ігри', {
 								type: item.name,
+								image: item.icon,
 							});
 						}}>
 							<View style={styles.blockText}>
-								<Text style={styles.number}>{item.count} Server</Text>
+								<Text style={styles.number}>{item.count} Ser</Text>
 								<Text style={styles.text}>{item.name}</Text>
 							</View>
-							{/* <Image style={styles.image} key={index} source={item.src} /> */}
+							<Image style={styles.image} key={index} source={{ uri: item.icon }} />
 						</Pressable>
 					)}
-				/>)}
+				/>
+				<LocalStorage />
 			</SafeAreaView>
 		</View>
 	);
@@ -125,23 +133,22 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		borderRadius: 30,
 		marginBottom: 10,
-		padding: 5,
-		paddingLeft: 15,
-		paddingRight: 15,
 		justifyContent: 'space-between',
 		alignItems: 'center',
+		gap: 10,
 	},
 	blockText: {
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		width: '80%',
+		width: '70%',
 	},
 	number: {
 		fontSize: 26,
 		fontWeight: '600',
 		color: 'black',
+		margin: 10,
 	},
 	text: {
 		fontSize: 24,
@@ -149,6 +156,10 @@ const styles = StyleSheet.create({
 		color: 'black',
 	},
 	image: {
+		height: 70,
+		width: 70,
+		margin: 4,
+		marginRight: 10,
 	},
 });
 
