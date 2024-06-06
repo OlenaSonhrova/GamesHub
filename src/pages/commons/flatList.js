@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar, faHeart } from '@fortawesome/free-solid-svg-icons';
 
@@ -7,7 +7,7 @@ import { faStar, faHeart } from '@fortawesome/free-solid-svg-icons';
 import ModalComponent from './modal';
 import { RemoveSelectedGame, SelectedGame } from '../../api/api';
 
-const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation }) => {
+const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, imageLocal }) => {
 
 	const [gamePressed, setGamePressed] = useState(null);
 	const [newData, setNewData] = useState(data);
@@ -20,30 +20,43 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation }) =
 		setGamePressed(game);
 	};
 
-	const setSelectedGame = (idGame, selected) => {
+	const setSelectedGame = async (idGame, selected) => {
 		if (selected) {
-			const updatedGames = newData.map((game) =>
-				game.name === idGame ? { ...game, is_selected: false } : game
-			);
-			setNewData(updatedGames);
-			RemoveSelectedGame(idGame, navigation);
+			const response = await RemoveSelectedGame(idGame, navigation);
+			if (response?.status !== 200) {
+				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+				return response?.status;
+			} else {
+				const updatedGames = newData.map((game) =>
+					game.name === idGame ? { ...game, is_selected: false } : game
+				);
+				setNewData(updatedGames);
+				return response?.status;
+			};
 		} else {
-			const updatedGames = newData.map((game) =>
-				game.name === idGame ? { ...game, is_selected: true } : game
-			);
-			setNewData(updatedGames);
-			SelectedGame(idGame, navigation);
+			const response = await SelectedGame(idGame, navigation);
+			if (response?.status !== 200) {
+				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+				return response?.status;
+			} else {
+				const updatedGames = newData.map((game) =>
+					game.name === idGame ? { ...game, is_selected: true } : game
+				);
+				setNewData(updatedGames);
+				return response?.status;
+			};
 		};
 	};
 
-	const updateRating = (idGame, newRating) => {
-		const updatedData = newData.map((game) => {
-			if (game.name === idGame) {
-				return { ...game, user_rating: newRating };
-			}
-			return game;
-		});
-		setNewData(updatedData);
+	const setRemoveGame = async (idGame) => {
+		const response = await RemoveSelectedGame(idGame, navigation);
+		if (response?.status !== 200) {
+			Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+			return;
+		} else {
+			const updatedGames = newData.filter((game) => game.name !== idGame);
+			setNewData(updatedGames);
+		};
 	};
 
 
@@ -69,7 +82,7 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation }) =
 							styles.block,
 						]} onPress={() => setSelectedGameHandler(item)}>
 							<View>
-								<Image style={styles.image} key={index} source={image ? { uri: image } : require('../../image/search.png')} />
+								<Image style={styles.image} key={index} source={image ? { uri: image } : imageLocal} />
 							</View>
 							<View style={styles.blockText}>
 								<Text style={styles.number}>{item.creation_date}</Text>
@@ -80,8 +93,14 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation }) =
 								</View>
 							</View>
 							<View>
-								<Pressable onPress={() => setSelectedGame(item.name, item.is_selected)}>
-									<FontAwesomeIcon icon={faHeart} size={30} color={item.is_selected ? 'red' : ''} />
+								<Pressable style={styles.blockHeart} onPress={() => {
+									if (item.is_selected === undefined) {
+										setRemoveGame(item.name, item.is_selected);
+									} else {
+										setSelectedGame(item.name, item.is_selected)
+									}
+								}}>
+									<FontAwesomeIcon icon={faHeart} size={30} color={item.is_selected === undefined ? 'red' : item.is_selected ? 'red' : 'black'} />
 								</Pressable>
 							</View>
 						</Pressable>
@@ -92,7 +111,7 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation }) =
 				)}
 			/>
 			{
-				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={() => setGamePressed(null)} setSelectedGame={setSelectedGame} updateRating={updateRating}/>
+				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={() => {setGamePressed(null); onRefresh();}} setSelectedGame={setSelectedGame} />
 				)}
 		</View>
 	);
@@ -112,11 +131,11 @@ const styles = StyleSheet.create({
 		borderRadius: 7,
 	},
 	blockText: {
-		flexBasis: '63%',
+		flexBasis: '50%',
 	},
 	text: {
 		color: 'black',
-		fontSize: 24,
+		fontSize: 20,
 	},
 	blockIcon: {
 		backgroundColor: 'green',
@@ -128,14 +147,18 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	rating: {
-		fontSize: 16,
+		fontSize: 14,
 		color: 'black',
 	},
 	image: {
-		height: 70,
-		width: 70,
+		height: 35,
+		width: 35,
 		margin: 4,
 		marginRight: 10,
+	},
+	blockHeart: {
+		paddingHorizontal: 26,
+		paddingVertical: 22,
 	},
 });
 

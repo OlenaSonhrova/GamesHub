@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHeart, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faPenToSquare, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile } from '@fortawesome/free-solid-svg-icons';
 
 
 import RatingGame from './raiting';
 
 
-const ModalComponent = ({ gamePressed, onClose, setSelectedGame }) => {
+const ModalMyGame = ({ gamePressed, onClose, imageLocal, returnedClickUpDate }) => {
 
 	const [modalVisible, setModalVisible] = useState(true);
 
@@ -16,21 +16,16 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame }) => {
 		return null;
 	};
 
-	const [selectedHard, setSelectedHard] = useState(gamePressed.is_selected);
-
 	const closeModal = () => {
 		setModalVisible(false);
 		onClose();
 	};
 
-const selectGame = async (name, selected) => {
-	const response = await setSelectedGame(name, selected);
-	if (response !== 200) {
-		return;
+	const upDateUserGame = (item) => {
+		returnedClickUpDate(item);
+		setModalVisible(false);
+		onClose();
 	};
-	setSelectedHard(!selectedHard);
-};
-
 
 	return (
 		<View>
@@ -42,24 +37,25 @@ const selectGame = async (name, selected) => {
 			>
 				<View style={styles.modalView}>
 					<View style={styles.head}>
-						<Pressable onPress={closeModal}
-							style={({ pressed }) => [
-								{
-									backgroundColor: pressed ? 'rgba(255, 255, 255, 0.1)' : '',
-								},
-								styles.arrowLeft,
-							]}>
-							<FontAwesomeIcon icon={faArrowLeft} size={40} />
-						</Pressable>
-						<View style={styles.headFlex}>
-							<Text style={styles.headText}>{gamePressed.name}</Text>
-							<View>
-								<Pressable onPress={() => selectGame(gamePressed.name, selectedHard)}>
-									<FontAwesomeIcon icon={faHeart} size={30} color={selectedHard || selectedHard === undefined ? 'red' : 'black'} />
-								</Pressable>
-							</View>
+						<View style={styles.headIcon}>
+							<Pressable onPress={closeModal}
+								style={({ pressed }) => [
+									{
+										backgroundColor: pressed ? 'rgba(255, 255, 255, 0.1)' : '',
+									},
+									styles.arrowLeft,
+								]}>
+								<FontAwesomeIcon icon={faArrowLeft} size={40} />
+							</Pressable>
+							<Pressable onPress={() => upDateUserGame(gamePressed)}>
+								<FontAwesomeIcon icon={faPenToSquare} size={40} color='#8D6349' />
+							</Pressable>
 						</View>
-						<RatingGame idGame={gamePressed.name} userRating={gamePressed.user_rating}/>
+						<View style={styles.headFlex}>
+							<Image style={styles.image} source={imageLocal} />
+							<Text style={styles.headText}>{gamePressed.name}</Text>
+						</View>
+
 					</View>
 					<View style={styles.body}>
 						<View style={styles.bodyIcon}>
@@ -112,15 +108,16 @@ const styles = StyleSheet.create({
 	headFlex: {
 		display: 'flex',
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		justifyContent: 'center',
 		alignItems: 'center',
 		paddingBottom: 30,
+		gap: 30,
+
 	},
 	headText: {
-		fontSize: 34,
+		fontSize: 38,
 		color: 'black',
 		fontWeight: '700',
-		maxWidth: '75%'
 	},
 	body: {
 		marginTop: 10,
@@ -128,6 +125,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#FFFAF5',
 		borderTopEndRadius: 20,
 		borderTopLeftRadius: 20,
+		height: '80%',
 	},
 	bodyIcon: {
 		display: 'flex',
@@ -162,7 +160,13 @@ const styles = StyleSheet.create({
 		color: 'black',
 		fontWeight: '400',
 	},
+	headIcon: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
 });
 
 
-export default ModalComponent;
+export default ModalMyGame;

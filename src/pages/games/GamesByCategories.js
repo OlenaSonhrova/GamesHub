@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GetAllGames } from '../../api/api';
 import Loader from '../../registration/components/loader';
 import FlatListComponent from '../commons/flatList';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const GamesByCategories = ({ route, navigation }) => {
@@ -34,6 +35,12 @@ const GamesByCategories = ({ route, navigation }) => {
 	const handleRefresh = async () => {
 		await refetch();
 	};
+
+	useFocusEffect(
+		React.useCallback(() => {
+			refetch();
+		}, [refetch])
+	);
 
 	if (isError) {
 		return (

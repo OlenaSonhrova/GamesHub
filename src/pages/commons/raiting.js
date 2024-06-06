@@ -1,13 +1,16 @@
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { Rating } from 'react-native-ratings';
 
 import { SetGameRating } from '../../api/api';
 
-const RatingGame = ({ idGame, userRating, navigation, updateRating }) => {
+const RatingGame = ({ idGame, userRating, navigation }) => {
 
 	const ratingCompleted = async (rating) => {
 		const respons = await SetGameRating(idGame, rating, navigation);
-		await updateRating(idGame, rating);
+		if (respons?.status !== 200) {
+			Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+			return;
+		};
 	};
 
 	return (

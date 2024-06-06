@@ -184,7 +184,7 @@ const SelectedGame = async (idGame, navigation) => {
 	});
 	try {
 		const response = await basePost(url, body, navigation);
-		return;
+		return response;
 	} catch (error) {
 		throw error;
 	};
@@ -197,7 +197,7 @@ const RemoveSelectedGame = async (idGame, navigation) => {
 	});
 	try {
 		const response = await basePost(url, body, navigation);
-		return;
+		return response;
 	} catch (error) {
 		console.log('Opssss.RemoveSelectedGame');
 		throw error;
@@ -212,8 +212,7 @@ const SetGameRating = async (idGame, rating, navigation) => {
 	});
 	try {
 		const response = await basePost(url, body, navigation);
-		const data = await response.json();
-		return data;
+		return response;
 	} catch (error) {
 		console.log('Opssss.RemoveSelectedGame');
 		throw error;
@@ -232,19 +231,9 @@ const SearchGames = async (body, navigation) => {
 	};
 };
 
-
-
-
-
 const GetAllGameLocations = async (nameUrl, navigation) => {
 	try {
 		const response = await baseGet(nameUrl, navigation);
-		// const id = await AsyncStorage.getItem('user_id');
-		// const url = ('http://176.36.224.228:24242/api_v1/getAllGameLocations?' + new URLSearchParams({ user_id: id }));
-		// const response = await fetch(url);
-		// const json = await response.json();
-		// console.log(json);
-		// return json?.locations;
 		return response;
 	} catch (error) {
 		console.error(error);
@@ -254,12 +243,6 @@ const GetAllGameLocations = async (nameUrl, navigation) => {
 
 const GetAllPlayerAges = async (nameUrl, navigation) => {
 	try {
-		// const id = await AsyncStorage.getItem('user_id');
-		// const url = ('http://176.36.224.228:24242/api_v1/getAllPlayerAges?' + new URLSearchParams({ user_id: id }));
-		// const response = await fetch(url);
-		// const json = await response.json();
-		// console.log(json.ages);
-		// return json?.ages;
 		const response = await baseGet(nameUrl, navigation);
 		return response;
 	} catch (error) {
@@ -270,12 +253,6 @@ const GetAllPlayerAges = async (nameUrl, navigation) => {
 
 const GetAllMoneyRanges = async (nameUrl, navigation) => {
 	try {
-		// const id = await AsyncStorage.getItem('user_id');
-		// const url = ('http://176.36.224.228:24242/api_v1/getAllMoneyRanges?' + new URLSearchParams({ user_id: id }));
-		// const response = await fetch(url);
-		// const json = await response.json();
-		// console.log(json);
-		// return json?.ranges;
 		const response = await baseGet(nameUrl, navigation);
 		return response;
 	} catch (error) {
@@ -286,12 +263,6 @@ const GetAllMoneyRanges = async (nameUrl, navigation) => {
 
 const GetAllGameDurations = async (nameUrl, navigation) => {
 	try {
-		// const id = await AsyncStorage.getItem('user_id');
-		// const url = ('http://176.36.224.228:24242/api_v1/getAllGameDurations?' + new URLSearchParams({ user_id: id }));
-		// const response = await fetch(url);
-		// const json = await response.json();
-		// console.log(json);
-		// return json?.durations;
 		const response = await baseGet(nameUrl, navigation);
 		return response;
 	} catch (error) {
@@ -302,12 +273,6 @@ const GetAllGameDurations = async (nameUrl, navigation) => {
 
 const GetAllPlayerCounts = async (nameUrl, navigation) => {
 	try {
-		// const id = await AsyncStorage.getItem('user_id');
-		// const url = ('http://176.36.224.228:24242/api_v1/getAllPlayerCounts?' + new URLSearchParams({ user_id: id }));
-		// const response = await fetch(url);
-		// const json = await response.json();
-		// console.log(json);
-		// return json?.counts;
 		const response = await baseGet(nameUrl, navigation);
 		return response;
 	} catch (error) {
@@ -316,192 +281,62 @@ const GetAllPlayerCounts = async (nameUrl, navigation) => {
 	};
 };
 
-
-
-
-
-
-
-const GetUserSelectedGames = async () => {
+const GetUserSelectedGames = async (nameUrl, navigation) => {
 	try {
-		const idUser = await AsyncStorage.getItem('user_id');
-		const url = ('http://176.36.224.228:24242/api_v1/getUserSelectedGames?' + new URLSearchParams({ user_id: idUser }));
-		const response = await fetch(url);
-		const json = await response.json();
-		return json?.games;
+		const response = await baseGet(nameUrl, navigation);
+		return response?.games;
 	} catch (error) {
 		console.error(error);
-		console.log(error.message);
-		alert('Opssss. GetUserSelectedGames', error);
+		throw error;
 	};
 };
 
-const GetUserCreatedGames = async () => {
+const GetUserCreatedGames = async (nameUrl, navigation) => {
 	try {
-		const id = await AsyncStorage.getItem('user_id');
-		const url = ('http://176.36.224.228:24242/api_v1/getUserCreatedGames?' + new URLSearchParams({ user_id: id }));
-		const response = await fetch(url);
-		const json = await response.json();
-		// console.log(json);
-		return json?.games;
+		const response = await baseGet(nameUrl, navigation);
+		return response?.games;
 	} catch (error) {
 		console.error(error);
-		console.log(error.message);
-		alert('Opssss.GetUserCreatedGames', error);
+		throw error;
 	};
 };
 
-// const SetGameRating = async (rating, idGame) => {
-// 	try {
-// 		const idUser = await AsyncStorage.getItem('user_id');
-// 		const url = "http://176.36.224.228:24242/api_v1/setGameRating";
-// 		const response = await fetch(url, {
-// 			method: 'POST',
-// 			headers: {
-// 				Accept: 'application/json',
-// 				'Content-Type': 'application/json',
-// 			},
-// 			body: JSON.stringify({
-// 				user_id: idUser,
-// 				game_id: idGame,
-// 				user_rating: rating,
-// 			}),
-// 		});
-// 		const json = await response.json();
-// 		// console.log(json);
-// 	} catch (error) {
-// 		console.error(error);
-// 		alert('Opssss. SetGameRating', error);
-// 	};
-// };
-
-const DeleteUserGame = async (idGame) => {
+const DeleteUserGame = async (nameUrl, idGame, navigation) => {
+	const url = SERVER_URL + nameUrl;
+	const body = JSON.stringify({
+		name: idGame,
+	});
 	try {
-		const url = "http://176.36.224.228:24242/api_v1/deleteUserGame";
-		const idUser = await AsyncStorage.getItem('user_id');
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				user_id: idUser,
-				game_id: idGame,
-			}),
-		});
-		const json = await response.json();
-		return json;
-		// console.log(json?.status)
+		const response = await basePost(url, body, navigation);
+		return response;
 	} catch (error) {
-		console.error(error);
-		alert('Opssss.RemoveSelectedGame', error);
+		console.log('Opssss.DeleteUserGame');
+		throw error;
 	};
 };
 
-const UpdateUserGame = async (name, selectedType, props, description, selectedDuration, selectedCountPlayers, selectedAge, selectedLocation, selectedMoney, gameIdForUpDAteInfa) => {
+const CreateUserGame = async (nameUrl, body, navigation) => {
+	const url = SERVER_URL + nameUrl;
 	try {
-		const url = "http://176.36.224.228:24242/api_v1/updateUserGame";
-		const idUser = await AsyncStorage.getItem('user_id');
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				name: name,
-				type: selectedType,
-				props: props,
-				description: description,
-				duration_sec: selectedDuration,
-				count_players: selectedCountPlayers,
-				age: selectedAge,
-				location: selectedLocation,
-				money: selectedMoney,
-				game_id: gameIdForUpDAteInfa,
-				user_id: idUser,
-				user_rating: 0,
-			}),
-		});
-
-		const json = await response.json();
-		if (json?.status === 'ERROR') {
-			alert(json?.error);
-			return;
-		};
-		const dataToSend = {
-			name: name,
-			type: selectedType,
-			props: props,
-			description: description,
-			duration_sec: selectedDuration,
-			count_players: selectedCountPlayers,
-			age: selectedAge,
-			location: selectedLocation,
-			money: selectedMoney,
-			game_id: gameIdForUpDAteInfa,
-			user_id: idUser,
-			user_rating: 0,
-		};
-		return dataToSend;
+		const response = await basePost(url, body, navigation);
+		return response;
 	} catch (error) {
-		console.error(error);
-		alert('Opssss. UpdateUserGame', error);
+		console.log('Opssss.DeleteUserGame');
+		throw error;
 	};
 };
 
-const CreateUserGame = async (name, selectedType, props, description, selectedDuration, selectedCountPlayers, selectedAge, selectedLocation, selectedMoney, formattedDate) => {
+const UpdateUserGame = async (nameUrl, body, navigation) => {
+	const url = SERVER_URL + nameUrl;
 	try {
-		const url = "http://176.36.224.228:24242/api_v1/createUserGame";
-		const idUser = await AsyncStorage.getItem('user_id');
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				name: name,
-				type: selectedType,
-				user_rating: 0,
-				props: props,
-				description: description,
-				duration_sec: selectedDuration,
-				count_players: selectedCountPlayers,
-				age: selectedAge,
-				location: selectedLocation,
-				money: selectedMoney,
-				user_id: idUser,
-			}),
-		});
-		const json = await response.json();
-		if (json?.status === 'ERROR') {
-			alert(json?.error);
-			return;
-		};
-		const dataToSend = {
-			name: name,
-			type: selectedType,
-			user_rating: 0,
-			props: props,
-			description: description,
-			duration_sec: selectedDuration,
-			count_players: selectedCountPlayers,
-			age: selectedAge,
-			location: selectedLocation,
-			money: selectedMoney,
-			user_id: idUser,
-			creation_date: formattedDate,
-			game_id: json?.data?.game_id,
-		};
-		console.log(dataToSend);
-		return dataToSend;
+		const response = await basePost(url, body, navigation);
+		return response;
 	} catch (error) {
-		console.error(error);
-		alert('Opssss. CreateUserGame', error);
+		console.log('Opssss.DeleteUserGame');
+		throw error;
 	};
 };
+
 
 export {
 	GetAllGames,

@@ -94,42 +94,11 @@ const styles = {
 		padding: 10,
 	},
 
-	buttonDisabled: {
-		backgroundColor: '#999',
-		borderRadius: 5,
-		padding: 10,
-	},
-
 	buttonLabel: {
 		fontSize: 14,
 		color: '#FFF',
 		alignSelf: 'center',
 	},
-	successTextStyle: {
-		color: 'white',
-		textAlign: 'center',
-		fontSize: 18,
-		padding: 30,
-	},
-	buttonStyle: {
-		backgroundColor: 'black',
-		borderWidth: 0,
-		color: '#FFFFFF',
-		borderColor: '#7DE24E',
-		height: 40,
-		alignItems: 'center',
-		borderRadius: 30,
-		marginLeft: 35,
-		marginRight: 35,
-		marginTop: 20,
-		marginBottom: 20,
-	},
-	buttonTextStyle: {
-		color: '#FFFFFF',
-		paddingVertical: 10,
-		fontSize: 16,
-	},
-
 }
 
 export default PrivacyPolicy;

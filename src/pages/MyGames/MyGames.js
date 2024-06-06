@@ -1,200 +1,84 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View, FlatList, Image, Modal, Alert, RefreshControl } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Pressable, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHeart, faPenToSquare, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile, faCirclePlus, faThumbsUp, faCircleMinus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {faCirclePlus, faCircleMinus } from '@fortawesome/free-solid-svg-icons';
 
 import AddGame from './addGames';
 import Loader from '../../registration/components/loader';
-import RatingGame from '../commons/raiting';
-import { DeleteUserGame, GetUserCreatedGames } from '../../api/api';
+import { GetUserCreatedGames } from '../../api/api';
+import FlatListInMyGame from '../commons/flatListInMyGame';
 
 
-const MyGamess = () => {
+const MyGamess = ({ navigation }) => {
 
-
+	const imageLocal = require('../../image/myGame.png');
 	const [addGameVisible, setAddGameVisible] = useState(false);
-	const [modalVisible, setModalVisible] = useState(false);
-	const [data, setData] = useState([]);
-	const [details, setDetails] = useState(" ");
+	const [newData, setNewData] = useState(data);
+	const [newItem, setNewItem] = useState();
 	const [upDate, setUpDate] = useState(false);
-	const [gameIdForUpDAteInfa, setGameIdForUpDAteInfa] = useState();
-	const [loading, setLoading] = useState(false);
-	const [refreshing, setRefreshing] = useState(false);
 
-
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoading(true);
-			const response = await GetUserCreatedGames();
-			setData(response);
-			setLoading(false);
-		}
-		fetchData();
-	}, []);
-
-
-	const onRefresh = useCallback(async () => {
-		setRefreshing(true);
-		const response = await GetUserCreatedGames();
-		setData(response);
-		setRefreshing(false);
-	}, [setData]);
-
-
-	const deleteUserGame = (idGame) => {
-		Alert.alert('Ви впевнені, що хочете видалити гру?', 'Гра видаляється назавжди', [
-			{
-				text: 'Cancel',
-				onPress: () => console.log('Cancel Pressed'),
-				style: 'cancel',
-			},
-			{
-				text: 'OK', onPress: async () => {
-					setData(data.filter((item) => item.game_id !== idGame));
-					const response = await DeleteUserGame(idGame);
-				}
-			},
-		]);
-	};
+	const { data, isLoading, isError, refetch } = useQuery(
+		{
+			queryKey: ["GetUserCreatedGames"],
+			queryFn: () => GetUserCreatedGames('/core/getUserCreatedGames/', navigation),
+			retry: 2,
+		},
+	);
 	
-	const handleData = (dataFromChild) => {
+	useEffect(() => {
+		setNewData(data);
+	}, [data]);
+
+	const handleRefresh = async () => {
+		await refetch();
+	};
+
+	if (isError) {
+		return <Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10, height: '100%'}} onPress={handleRefresh}>Перевірте з'днання з Інтернетом</Text>
+	};
+
+
+	const returnedDataAdd = async (newGame) => {
 		setAddGameVisible(!addGameVisible);
-		setUpDate(false);
-		if (dataFromChild === "close window") {
-			console.log('close window');
-		} else {
-			const getIdGame = dataFromChild.game_id;
-			if (gameIdForUpDAteInfa !== getIdGame) {
-				setData([...data, dataFromChild]);
-			} else {
-			};
+		if (newGame) {
+			setNewData([...newData, newGame]);
 		};
 	};
 
-	const upDateUserGame = (idGame) => {
+	const returnedDataUp = async (newGame, oldName) => {
 		setAddGameVisible(!addGameVisible);
-		setUpDate(true);
-		setGameIdForUpDAteInfa(idGame);
+		setUpDate(!upDate);
+		if (newGame) {
+			const updatedGames = newData.filter((game) => game.name !== oldName);
+			setNewData([...updatedGames, newGame]);
+		};
 	};
 
 
-	return (
-		<View style={styles.backgroundColor}>
-			<Loader loading={loading} />
-			<SafeAreaView>
-				<Pressable style={styles.addGameBlock} onPress={() => { setAddGameVisible(!addGameVisible); setUpDate(false) }}>
-					<Text style={styles.addGameText}>Додати гру</Text>
-					<FontAwesomeIcon icon={addGameVisible ? faCircleMinus : faCirclePlus} size={30} color='#8D6349' />
-				</Pressable>
-				{addGameVisible ? <AddGame onDataSubmit={handleData} details={data} upDate={upDate} gameIdForUpDAteInfa={gameIdForUpDAteInfa} /> : null}
-				<View style={styles.center}>
-					<FlatList
-						data={data} extraData={data} windowSize={10} keyExtractor={item => item.game_id}
-						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-						renderItem={({ item }) => (
-							<View>
-								<Pressable style={styles.block} onPress={() => {
-									setModalVisible(true);
-									setDetails(item);
-								}}>
-									<View>
-										<Image style={styles.image} source={require('../../image/myGame.png')} />
-									</View>
-									<View style={styles.blockText}>
-										<Text style={styles.number}>{item.creation_date}</Text>
-										<Text style={styles.text}>{item.name}</Text>
-										<View style={styles.rating}>
-											<FontAwesomeIcon icon={faThumbsUp} size={15} color='#8D6349' />
-											<Text >{item.rating}</Text>
-										</View>
-									</View>
-									<View style={styles.blockDeletUpDate}>
-										<View>
-											<Pressable onPress={() => upDateUserGame(item.game_id)}>
-												<FontAwesomeIcon icon={faPenToSquare} size={25} color='#8D6349' />
-											</Pressable>
-										</View>
-										<View>
-											<Pressable onPress={() => deleteUserGame(item.game_id)}>
-												<FontAwesomeIcon icon={faTrash} size={25} color='#8D6349' />
-											</Pressable>
-										</View>
-									</View>
-								</Pressable>
-								<Modal
-									animationType="fade"
-									transparent={true}
-									visible={modalVisible}
-								>
-									<View style={styles.modalView}>
-										<View style={styles.head}>
-											<Pressable onPress={() => {
-												setModalVisible(!modalVisible);
-												setDetails(" ")
-											}} style={styles.arrowLeft}>
-												<FontAwesomeIcon icon={faArrowLeft} size={40} color='black' />
-											</Pressable>
-											<View style={styles.headFlex}>
-												<Text style={styles.headText}>{details.name}</Text>
-												<Image source={require('../../image/myGame.png')} />
-												<View>
-													<Pressable onPress={() => setSelectedGame(details.game_id, details.is_selected)}>
-														<FontAwesomeIcon icon={faHeart} size={30} color={details.is_selected ? 'red' : ''} />
-													</Pressable>
-												</View>
-											</View>
-											<RatingGame idGame={details.game_id} userRating={details.user_rating} />
-										</View>
-										<View style={styles.body}>
-											<View style={styles.bodyIcon}>
-												<View style={styles.bodyIconItem}>
-													<FontAwesomeIcon icon={faStopwatch} size={30} color='black' />
-													<Text style={styles.bodyIconTextt}>{details.duration_sec} хв.</Text>
-												</View>
-												<View style={styles.bodyIconItem}>
-													<FontAwesomeIcon icon={faUsers} size={30} color='black' />
-													<Text style={styles.bodyIconTextt}>{details.count_players} уч.</Text>
-												</View>
-												<View style={styles.bodyIconItem}>
-													<FontAwesomeIcon icon={faFaceSmile} size={30} color='black' />
-													<Text style={styles.bodyIconTextt}>{details.age} років</Text>
-												</View>
-												<View style={styles.bodyIconItem}>
-													<FontAwesomeIcon icon={faLocationDot} size={30} color='black' />
-													<Text style={styles.bodyIconTextt}>{details.location}</Text>
-												</View>
-											</View>
-											<ScrollView style={styles.bodyInfa}>
-												<View style={styles.bodyInfaItem}>
-													<Text style={styles.bodyInfaTitle}>Основне завдання</Text>
-													<Text style={styles.bodyInfaText}>{details.description}</Text>
-												</View>
-												<View style={styles.bodyInfaItem}>
-													<Text style={styles.bodyInfaTitle}>Реквізит</Text>
-													<Text style={styles.bodyInfaText}>{details.props}</Text>
-												</View>
-											</ScrollView>
-											<Text style={styles.paddingBottom}>Автор: {details.author}</Text>
-										</View>
-									</View>
-								</Modal>
-							</View>
-						)
-						}
-						ListFooterComponent={() => (
-							<Text style={{ fontSize: 30, marginBottom: 100, textAlign: "center", fontWeight: 'bold' }}>Thank You</Text>
-						)}
-					/>
-				</View>
-			</SafeAreaView>
-		</View>
+	const returnedClickUpDate = (item) => {
+		setAddGameVisible(!addGameVisible);
+		setUpDate(!upDate);
+		setNewItem(item);
+	};
 
+	return (
+		<SafeAreaView style={styles.backgroundColor}>
+			<Pressable style={styles.addGameBlock} onPress={() => { setAddGameVisible(!addGameVisible) }}>
+				<Text style={styles.addGameText}>Додати гру</Text>
+				<FontAwesomeIcon icon={addGameVisible ? faCircleMinus : faCirclePlus} size={30} color='#8D6349' />
+			</Pressable>
+			{addGameVisible ? <AddGame returnedDataAdd={returnedDataAdd} returnedDataUp={returnedDataUp} item={newItem} upDate={upDate} /> : null}
+			<View style={styles.center}>
+				{isLoading ? <Loader /> : <FlatListInMyGame data={newData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} />}
+			</View>
+		</SafeAreaView>
 	);
 };
 
 const styles = StyleSheet.create({
 	center: {
-		height: '100%',
+		margin: 10,
 	},
 	backgroundColor: {
 		backgroundColor: '#FFFAF5',
@@ -205,100 +89,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: 10,
 		paddingBottom: 10,
-	},
-	blockText: {
-		flexBasis: '63%',
-	},
-	block: {
-		margin: 10,
-		marginBottom: 0,
-		display: 'flex',
-		flexDirection: 'row',
-		gap: 20,
-		alignItems: 'center',
-		backgroundColor: '#EEC9B0',
-		padding: 5,
-		borderRadius: 7,
-	},
-	blockText: {
-		flexBasis: '63%',
-	},
-	text: {
-		color: 'black',
-		fontSize: 24,
-	},
-	rating: {
-		display: 'flex',
-		flexDirection: 'row',
-		gap: 10,
-		alignItems: 'center',
-	},
-	modalView: {
-		margin: 0,
-		padding: 7,
-		backgroundColor: '#EEC9B0',
-		height: '100%',
-	},
-	arrowLeft: {
-		padding: 10,
-	},
-	headFlex: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-	},
-	headText: {
-		fontSize: 34,
-		color: 'black',
-		fontWeight: '700',
-		paddingBottom: 30,
-	},
-	body: {
-		marginTop: 10,
-		padding: 5,
-		backgroundColor: '#FFFAF5',
-		borderTopEndRadius: 20,
-		borderTopLeftRadius: 20,
-	},
-	bodyIcon: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-around',
-		alignItems: 'center',
-		paddingBottom: 30,
-	},
-	bodyIconItem: {
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	bodyIconTextt: {
-		maxWidth: 100,
-		fontSize: 16,
-		color: 'black',
-	},
-	bodyInfa: {
-		display: 'flex',
-		gap: 30,
-		height: '62%',
-	},
-	bodyInfaTitle: {
-		fontSize: 34,
-		color: '#8D6349',
-		fontWeight: '500',
-		paddingBottom: 5,
-	},
-	bodyInfaText: {
-		fontSize: 18,
-		color: 'black',
-		fontWeight: '400',
-	},
-	fontAwesomeIcon: {
-		color: 'red'
-	},
-	blockDeletUpDate: {
-		display: 'flex',
-		gap: 10,
 	},
 });
 

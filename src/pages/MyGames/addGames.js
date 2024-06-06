@@ -1,27 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { CreateUserGame, GetAllGameDurations, GetAllGameLocations, getAllGameTypes, GetAllMoneyRanges, GetAllPlayerAges, GetAllPlayerCounts, UpdateUserGame } from '../../api/api';
+
 import Loader from '../../registration/components/loader';
 
 
-const type = ["TeamBuilding", "Криголами", "Челенджі", "IQ", "Естафети", "Загальнотабірні", "Інші"];
-const location = ["Вулиця", "Спортзал", "Спортивний майданчик", "Приміщення", "Online", "Поле", "Гори", "Ліс", "Море", "Інше"];
-const age = ["1-4", "5-9", "10-14", "15+", "30+", "1-99"];
-const money = ["0", "1-50", "50-100", "100-200", "200-500", "500+"];
-const duration = ["1", "2", "5", "10", "20+"];
-const countPlayers = ["1-5", "1-10", "10-30", "30+"];
 
-const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
+const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate }) => {
 
 	const [name, setName] = useState('');
-	const [newType, setNewType] = useState(type);
+	const [oldName, setOldName] = useState('');
+	const [type, setType] = useState([]);
 	const [props, setProps] = useState('');
 	const [description, setDescription] = useState('');
-	const [newDuration, setNewDuration] = useState(duration);
-	const [newCountPlayers, setNewCountPlayers] = useState(countPlayers);
-	const [newAge, setNewAge] = useState(age);
-	const [newLocation, setNewLocation] = useState(location);
-	const [newMoney, setNewMoney] = useState(money);
+	const [duration, setDuration] = useState([]);
+	const [countPlayers, setCountPlayers] = useState([]);
+	const [age, setAge] = useState([]);
+	const [location, setLocation] = useState([]);
+	const [money, setMoney] = useState([]);
+
 
 	const [selectedType, setSelectedType] = useState('');
 	const [selectedDuration, setSelectedDuration] = useState('');
@@ -29,49 +26,42 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 	const [selectedAge, setSelectedAge] = useState('');
 	const [selectedLocation, setSelectedLocation] = useState('');
 	const [selectedMoney, setSelectedMoney] = useState('');
+	const [toggleSwitch, setToggleSwitch] = useState(false);
 
 	const [loading, setLoading] = useState(false);
-
-	const today = new Date();
-	const year = today.getFullYear();
-	const month = String(today.getMonth() + 1).padStart(2, '0');
-	const day = String(today.getDate()).padStart(2, '0');
-	const formattedDate = `${year}/${month}/${day}`;
-
-
-	useEffect(() => {
-		if (upDate) {
-			const game = details.filter(item => item.game_id === gameIdForUpDAteInfa);
-			setName(game[0]?.name);
-			setProps(game[0]?.props);
-			setDescription(game[0]?.description);
-			setSelectedType(game[0]?.type);
-			setSelectedDuration(game[0]?.duration_sec);
-			setSelectedCountPlayers(game[0]?.count_players);
-			setSelectedAge(game[0]?.age);
-			setSelectedLocation(game[0]?.location);
-			setSelectedMoney(game[0]?.money);
-		}
-	}, [upDate, details, gameIdForUpDAteInfa]);
+	const [animating, setAnimating] = useState(false);
 
 	const getDataInfa = async () => {
 		setLoading(true);
 		try {
-			const type = await getAllGameTypes();
-			const typeName = type.map(item => item.name);
+			const type = await getAllGameTypes('/core/getAllGameTypes/', navigation);
+			const typeName = type?.types.map(item => item.name);
 
-			const location = await GetAllGameLocations();
-			const age = await GetAllPlayerAges();
-			const count = await GetAllPlayerCounts();
-			const money = await GetAllMoneyRanges();
-			const duration = await GetAllGameDurations();
+			const location = await GetAllGameLocations('/core/getAllGameLocations/', navigation);
+			const age = await GetAllPlayerAges('/core/getAllPlayerAges/', navigation);
+			const count = await GetAllPlayerCounts('/core/getAllPlayerCounts/', navigation);
+			const money = await GetAllMoneyRanges('/core/getAllMoneyRanges/', navigation);
+			const duration = await GetAllGameDurations('/core/getAllGameDurations/', navigation);
+			setType(typeName);
+			setLocation(location?.locations);
+			setAge(age?.ages);
+			setCountPlayers(count?.counts);
+			setMoney(money?.ranges);
+			setDuration(duration?.durations);
 
-			setNewType(typeName);
-			setNewLocation(location);
-			setNewAge(age);
-			setNewCountPlayers(count);
-			setNewMoney(money);
-			setNewDuration(duration);
+			if (upDate) {
+				setName(item.name);
+				setOldName(item.name);
+				setProps(item.props);
+				setDescription(item.description);
+				setSelectedType(item.game_type);
+				setSelectedDuration(item.duration_sec);
+				setSelectedCountPlayers(item.count_players);
+				setSelectedAge(item.player_age);
+				setSelectedLocation(item.location);
+				setSelectedMoney(item.money_range);
+				setToggleSwitch(item.is_private);
+			}
 
 			setLoading(false);
 		} catch (error) {
@@ -96,16 +86,58 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 		if (!selectedLocation) { alert('Будь ласка, оберіть локацію'); return; };
 		if (!selectedMoney) { alert('Будь ласка, оберіть кількість необхідних фінансів'); return; };
 
-		const dataToSend = "close window";
-		onDataSubmit(dataToSend);
+		setAnimating(!animating);
 
 		if (upDate) {
-			const upDateGame = await UpdateUserGame(name, selectedType, props, description, selectedDuration, selectedCountPlayers, selectedAge, selectedLocation, selectedMoney, gameIdForUpDAteInfa);
-			onDataSubmit(upDateGame);
-
+			const body = JSON.stringify({
+				name: oldName,
+				new_name: name,
+				user_rating: 0,
+				props: props,
+				description: description,
+				game_type: selectedType,
+				duration_sec: selectedDuration,
+				count_players: selectedCountPlayers,
+				player_age: selectedAge,
+				location: selectedLocation,
+				money_range: selectedMoney,
+				is_private: toggleSwitch
+			});
+			console.log('setAnimating 2');
+			const nameUrl = '/core/updateUserGame/';
+			const response = await UpdateUserGame(nameUrl, body, navigation);
+			if (response?.status !== 200 && response?.status !== 201) {
+				setAnimating(!animating);
+				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+				return;
+			};
+			setAnimating(!animating);
+			const newGame = await response.json();
+			returnedDataUp(newGame, oldName);
 		} else {
-			const createGame = await CreateUserGame(name, selectedType, props, description, selectedDuration, selectedCountPlayers, selectedAge, selectedLocation, selectedMoney, formattedDate);
-			onDataSubmit(createGame);
+			const body = JSON.stringify({
+				name: name,
+				user_rating: 0,
+				props: props,
+				description: description,
+				game_type: selectedType,
+				duration_sec: selectedDuration,
+				count_players: selectedCountPlayers,
+				player_age: selectedAge,
+				location: selectedLocation,
+				money_range: selectedMoney,
+				is_private: toggleSwitch
+			});
+			const nameUrl = '/core/createUserGame/';
+			const response = await CreateUserGame(nameUrl, body, navigation);
+			if (response?.status !== 200 && response?.status !== 201) {
+				setAnimating(!animating);
+				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+				return;
+			};
+			setAnimating(!animating);
+			const newGame = await response.json();
+			returnedDataAdd(newGame);
 		};
 	};
 
@@ -143,11 +175,11 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					/>
 					<Text style={styles.valueText}>Категорія:</Text>
 					<View style={styles.block}>
-						{newType.map((type, index) => {
+						{type.map((typeItem, index) => {
 							return (
-								<Pressable key={index} style={{ backgroundColor: selectedType === type ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedType(type) }}>
+								<Pressable key={index} style={{ backgroundColor: selectedType === typeItem ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedType(typeItem) }}>
 									<View>
-										<Text style={styles.blockText}>{type}</Text>
+										<Text style={styles.blockText}>{typeItem}</Text>
 									</View>
 								</Pressable>
 							);
@@ -155,11 +187,11 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Тривалість гри:</Text>
 					<View style={styles.block}>
-						{newDuration.map((duration, index) => {
+						{duration.map((durationItem, index) => {
 							return (
-								<Pressable key={index} style={{ backgroundColor: selectedDuration === duration ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedDuration(duration) }}>
+								<Pressable key={index} style={{ backgroundColor: selectedDuration === durationItem ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedDuration(durationItem) }}>
 									<View>
-										<Text style={styles.blockText}>{duration} хв.</Text>
+										<Text style={styles.blockText}>{durationItem} хв.</Text>
 									</View>
 								</Pressable>
 							);
@@ -167,11 +199,11 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Кількість учасників:</Text>
 					<View style={styles.block}>
-						{newCountPlayers.map((countPlayers, index) => {
+						{countPlayers.map((countPlayersItem, index) => {
 							return (
-								<Pressable key={index} style={{ backgroundColor: selectedCountPlayers === countPlayers ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedCountPlayers(countPlayers) }}>
+								<Pressable key={index} style={{ backgroundColor: selectedCountPlayers === countPlayersItem ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedCountPlayers(countPlayersItem) }}>
 									<View>
-										<Text style={styles.blockText}>{countPlayers}</Text>
+										<Text style={styles.blockText}>{countPlayersItem}</Text>
 									</View>
 								</Pressable>
 							);
@@ -179,11 +211,11 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Вік (років):</Text>
 					<View style={styles.block}>
-						{newAge.map((age, index) => {
+						{age.map((ageItem, index) => {
 							return (
-								<Pressable key={index} style={{ backgroundColor: selectedAge === age ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedAge(age) }}>
+								<Pressable key={index} style={{ backgroundColor: selectedAge === ageItem ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedAge(ageItem) }}>
 									<View>
-										<Text style={styles.blockText}>{age}</Text>
+										<Text style={styles.blockText}>{ageItem}</Text>
 									</View>
 								</Pressable>
 							);
@@ -191,11 +223,11 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Локація:</Text>
 					<View style={styles.block}>
-						{newLocation.map((location, index) => {
+						{location.map((locationItem, index) => {
 							return (
-								<Pressable key={index} style={{ backgroundColor: selectedLocation === location ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedLocation(location) }}>
+								<Pressable key={index} style={{ backgroundColor: selectedLocation === locationItem ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedLocation(locationItem) }}>
 									<View>
-										<Text style={styles.blockText}>{location}</Text>
+										<Text style={styles.blockText}>{locationItem}</Text>
 									</View>
 								</Pressable>
 							);
@@ -203,23 +235,40 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 					</View>
 					<Text style={styles.valueText}>Фінанси (грн):</Text>
 					<View style={styles.block}>
-						{newMoney.map((money, index) => {
+						{money.map((moneyItem, index) => {
 							return (
-								<Pressable key={index} style={{ backgroundColor: selectedMoney === money ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedMoney(money) }}>
+								<Pressable key={index} style={{ backgroundColor: selectedMoney === moneyItem ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedMoney(moneyItem) }}>
 									<View>
-										<Text style={styles.blockText}>{money}</Text>
+										<Text style={styles.blockText}>{moneyItem}</Text>
 									</View>
 								</Pressable>
 							);
 						})}
 					</View>
+					<View style={styles.containerSwitch}>
+						<Text style={styles.blockText}>Приватна гра: </Text>
+						<Switch
+							trackColor={{ false: '#FAE2D4', true: '#B66A53' }}
+							style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }], marginTop: 10, }}
+							value={toggleSwitch}
+							thumbColor={'#fff'}
+							onChange={() => setToggleSwitch(!toggleSwitch)}
+						/>
+					</View>
 					<View style={styles.buttonCenter}>
 						<Pressable onPress={addGame} style={styles.button}>
 							<Text style={styles.buttonText}>Зберегти</Text>
+							<ActivityIndicator
+								animating={animating}
+								color="#000000"
+								size="large"
+								style={styles.activityIndicator}
+							/>
 						</Pressable>
 					</View>
 				</View>
 			</ScrollView>}
+			<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 40, fontWeight: 'bold' }}>Thank You</Text>
 
 		</SafeAreaView>
 	);
@@ -227,14 +276,11 @@ const AddGame = ({ onDataSubmit, details, upDate, gameIdForUpDAteInfa }) => {
 
 const styles = StyleSheet.create({
 	container: {
-		height: '54%',
+		height: '100%',
 	},
 	inputAddGameBlock: {
 		marginLeft: 12,
 		marginRight: 12,
-	},
-	addGameText: {
-		fontSize: 24,
 	},
 	input: {
 		height: 40,
@@ -243,41 +289,25 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		padding: 10,
 	},
-	valueText: {
-
-	},
 	button: {
 		alignItems: 'center',
-		padding: 10,
 		paddingLeft: 60,
-		paddingRight: 60,
+		paddingRight: 20,
 		borderRadius: 4,
 		backgroundColor: '#FAE2D4',
 		marginTop: 15,
-
+		display: 'flex',
+		flexDirection: 'row',
+		gap: 20,
 	},
 	buttonText: {
 		color: 'black',
 		fontSize: 24,
+		fontWeight: 'bold',
 	},
 	buttonCenter: {
 		display: 'flex',
 		alignItems: 'center',
-	},
-	buttonStyle: {
-		height: 40,
-		width: '100%',
-		marginTop: 5,
-		marginBottom: 5,
-		borderWidth: 1,
-		padding: 10,
-		backgroundColor: '#FFFAF5',
-	},
-	buttonTextStyle: {
-		color: 'black',
-		fontSize: 14,
-		textAlign: 'left',
-		fontWeight: 600,
 	},
 	inputArea: {
 		height: 160,
@@ -289,10 +319,22 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 	},
 	blockText: {
-		// minWidth: '30%',
 		textAlign: 'center',
 		margin: 8,
-
+		fontWeight: 'bold',
+	},
+	containerSwitch: {
+		display: 'flex',
+		flexDirection: 'row',
+		gap: 20,
+		alignItems: 'center',
+	},
+	containerSwitchText: {
+		fontSize: 20,
+		color: 'black',
+	},
+	activityIndicator: {
+		height: 80,
 	},
 });
 

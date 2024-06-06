@@ -60,10 +60,11 @@ const Games = ({ navigation }) => {
 							]} onPress={() => {
 								navigation.navigate('Ігри', {
 									type: item.name,
+									image: item.icon,
 								});
 							}}>
 								<View style={styles.blockText}>
-									<Text style={styles.number}>{item.count} Lock</Text>
+									<Text style={styles.number}>{item.count}</Text>
 									<Text style={styles.text}>{item.name}</Text>
 								</View>
 								<Image style={styles.image} key={index} source={{ uri: item.icon }} />
@@ -101,7 +102,7 @@ const Games = ({ navigation }) => {
 							});
 						}}>
 							<View style={styles.blockText}>
-								<Text style={styles.number}>{item.count} Ser</Text>
+								<Text style={styles.number}>{item.count}</Text>
 								<Text style={styles.text}>{item.name}</Text>
 							</View>
 							<Image style={styles.image} key={index} source={{ uri: item.icon }} />
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
 	block: {
 		display: 'flex',
 		flexDirection: 'row',
-		borderRadius: 30,
+		borderRadius: 7,
 		marginBottom: 10,
 		justifyContent: 'space-between',
 		alignItems: 'center',
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
 		width: '70%',
 	},
 	number: {
-		fontSize: 26,
+		fontSize: 20,
 		fontWeight: '600',
 		color: 'black',
 		margin: 10,
@@ -156,8 +157,8 @@ const styles = StyleSheet.create({
 		color: 'black',
 	},
 	image: {
-		height: 70,
-		width: 70,
+		height: 35,
+		width: 35,
 		margin: 4,
 		marginRight: 10,
 	},
