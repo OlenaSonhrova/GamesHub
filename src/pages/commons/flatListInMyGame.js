@@ -36,6 +36,7 @@ const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imag
 						return;
 					};
 					const updatedGames = newData.filter((game) => game.name !== idGame);
+					// const updatedGames = data.filter((game) => game.name!== idGame);
 					setNewData(updatedGames);
 				}
 			},
@@ -80,13 +81,13 @@ const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imag
 							</View>
 							<View style={styles.blockDeletUpDate}>
 								<View>
-									<Pressable onPress={() => upDateUserGame(item)}>
-										<FontAwesomeIcon icon={faPenToSquare} size={25} color='#8D6349' />
+									<Pressable style={styles.blockDelet} onPress={() => deleteUserGame(item.name)}>
+										<FontAwesomeIcon icon={faTrash} size={30} color='#8D6349' />
 									</Pressable>
 								</View>
 								<View>
-									<Pressable onPress={() => deleteUserGame(item.name)}>
-										<FontAwesomeIcon icon={faTrash} size={25} color='#8D6349' />
+									<Pressable style={styles.blockUpDate} onPress={() => upDateUserGame(item)}>
+										<FontAwesomeIcon icon={faPenToSquare} size={30} color='#8D6349' />
 									</Pressable>
 								</View>
 							</View>
@@ -94,7 +95,7 @@ const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imag
 					</View>
 				)}
 				ListFooterComponent={() => (
-					<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 30, fontWeight: 'bold' }}>Thank You</Text>
+					<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 30, fontWeight: 'bold' }}> </Text>
 				)}
 			/>
 			{
@@ -109,16 +110,16 @@ const styles = StyleSheet.create({
 		height: '100%',
 	},
 	block: {
-		marginBottom: 10,
+		marginBottom: 8,
 		display: 'flex',
 		flexDirection: 'row',
-		gap: 10,
+		// gap: 10,
 		alignItems: 'center',
 		padding: 5,
 		borderRadius: 7,
 	},
 	blockText: {
-		flexBasis: '63%',
+		flexBasis: '55%',
 	},
 	text: {
 		color: 'black',
@@ -142,7 +143,13 @@ const styles = StyleSheet.create({
 	},
 	blockDeletUpDate: {
 		display: 'flex',
-		gap: 10,
+		flexDirection: 'row',
+	},
+	blockUpDate: {
+		padding: 13,
+	},
+	blockDelet: {
+		padding: 13,
 	},
 });
 

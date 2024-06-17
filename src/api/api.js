@@ -131,7 +131,13 @@ const logout = async () => {
 		refresh: refresh,
 	});
 	try {
-		const response = await basePost(url, body);
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: body
+		});
 		return response?.status;
 	} catch (error) {
 		console.error('Error logout data:', error);
@@ -147,8 +153,15 @@ const Register = async (userName, userEmail, userPassword) => {
 		password: userPassword,
 	});
 	try {
-		const response = await basePost(url, body);
-		return response?.status;
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: body
+		});;
+		const jsonData = await response.json();
+		return jsonData;
 	} catch (error) {
 		console.error('Error logout data:', error);
 		throw error;
@@ -337,6 +350,26 @@ const UpdateUserGame = async (nameUrl, body, navigation) => {
 	};
 };
 
+const ChangeInternet = async () => {
+	const nameUrl = '/users/info/';
+	const url = SERVER_URL + nameUrl;
+	const access = await AsyncStorage.getItem('access');
+	try {
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${access}`,
+				'Content-Type': 'application/json'
+			}
+		});
+		console.log('finish in ChangeInternet', nameUrl, response?.status);
+		return response?.status ;
+	} catch (error) {
+		console.error('Error baseGet data:', error);
+		throw error;
+	}
+};
+
 
 export {
 	GetAllGames,
@@ -359,5 +392,6 @@ export {
 	GetAllPlayerCounts,
 	UpdateUserGame,
 	CreateUserGame,
-	SearchGames
+	SearchGames,
+	ChangeInternet
 };

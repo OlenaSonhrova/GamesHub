@@ -21,35 +21,56 @@ const screenOptionStyle = {
 	headerBackTitle: "Back",
 };
 
-const GamesStackNavigator = () => {
+
+const GamesStackNavigator = ({ offline, statusServer }) => {
 	return (
 		<Stack.Navigator screenOptions={screenOptionStyle}>
-			<Stack.Screen name="GamesStack" component={Games} />
-			<Stack.Screen name="Ігри" component={GamesByCategories} options={{ headerShown: true }} />
+			{/* <Stack.Screen name="GamesStack" component={Games} /> */}
+			<Stack.Screen name="GamesStack">
+				{() => <Games offline={offline} statusServer={statusServer}/>}
+			</Stack.Screen>
+			{/* <Stack.Screen name="Ігри" component={GamesByCategories} options={{ headerShown: true }} /> */}
+			<Stack.Screen name="Ігри" options={{ headerShown: true }}>
+				{() => <GamesByCategories offline={offline} statusServer={statusServer}/>}
+			</Stack.Screen>
 		</Stack.Navigator>
 	);
 }
 
-const SearchStackNavigator = () => {
+const SearchStackNavigator = ({ offline, statusServer }) => {
 	return (
 		<Stack.Navigator screenOptions={screenOptionStyle}>
-			<Stack.Screen name="SearchStack" component={Search} />
+			<Stack.Screen name="SearchStack">
+				{() => <Search offline={offline} statusServer={statusServer} />}
+			</Stack.Screen>
 		</Stack.Navigator>
 	);
 }
 
-const Liked = () => {
+// const SearchStackNavigator = () => {
+// 	return (
+// 		<Stack.Navigator screenOptions={screenOptionStyle}>
+// 			<Stack.Screen name="SearchStack" component={Search} />
+// 		</Stack.Navigator>
+// 	);
+// }
+
+const Liked = ({ offline, statusServer }) => {
 	return (
 		<Stack.Navigator screenOptions={screenOptionStyle}>
-			<Stack.Screen name="LikedStack" component={Likedd} />
+			<Stack.Screen name="LikedStack">
+				{() => <Likedd offline={offline} statusServer={statusServer} />}
+			</Stack.Screen>
 		</Stack.Navigator>
 	);
 }
 
-const MyGames = () => {
+const MyGames = ({ offline, statusServer }) => {
 	return (
 		<Stack.Navigator screenOptions={screenOptionStyle}>
-			<Stack.Screen name="MyGamesStack" component={MyGamess} />
+			<Stack.Screen name="MyGamesStack">
+				{() => <MyGamess offline={offline} statusServer={statusServer} />}
+			</Stack.Screen>
 		</Stack.Navigator>
 	);
 }

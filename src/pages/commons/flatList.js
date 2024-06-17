@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar, faHeart } from '@fortawesome/free-solid-svg-icons';
 
@@ -59,6 +59,13 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 		};
 	};
 
+	if (refreshing) {
+		return (
+			<View style={styles.center}>
+				<ActivityIndicator size="large" color="gray" />
+			</View>
+		);
+	}
 
 	return (
 		<View style={styles.center}>
@@ -107,11 +114,11 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 					</View>
 				)}
 				ListFooterComponent={() => (
-					<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 30, fontWeight: 'bold' }}>Thank You</Text>
+					<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 30, fontWeight: 'bold' }}> </Text>
 				)}
 			/>
 			{
-				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={() => {setGamePressed(null); onRefresh();}} setSelectedGame={setSelectedGame} />
+				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={() => { setGamePressed(null); onRefresh(); }} setSelectedGame={setSelectedGame} />
 				)}
 		</View>
 	);
@@ -131,7 +138,7 @@ const styles = StyleSheet.create({
 		borderRadius: 7,
 	},
 	blockText: {
-		flexBasis: '50%',
+		flexBasis: '63%',
 	},
 	text: {
 		color: 'black',

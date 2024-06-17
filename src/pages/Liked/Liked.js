@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 
 import Loader from '../../registration/components/loader';
@@ -10,12 +11,29 @@ import { useFocusEffect } from '@react-navigation/native';
 
 
 
-const Likedd = ({ navigation }) => {
+const Likedd = ({ navigation, offline, statusServer }) => {
 
 	const imageLocal = require('../../image/like.png');
 
+	const [localData, setLocalData] = useState([]);
 
-	const { data, isLoading, isError, refetch } = useQuery(
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await AsyncStorage.getItem('SelectedGames');
+			const games = JSON.parse(response);
+			setLocalData(games);
+		};
+		fetchData();
+	}, []);
+
+	useEffect(() => {
+		if (offline) {
+		} else {
+			refetch();
+		}
+	}, [offline]);
+
+	const { data, isLoading, isError, isRefetching, refetch } = useQuery(
 		{
 			queryKey: ["GetUserSelectedGames"],
 			queryFn: () => GetUserSelectedGames('/core/getUserSelectedGames/', navigation),
@@ -29,18 +47,26 @@ const Likedd = ({ navigation }) => {
 
 	useFocusEffect(
 		React.useCallback(() => {
-			refetch();
-		}, [refetch])
+			if (!offline) {
+				refetch();
+			};
+		}, [refetch, offline])
 	);
 
 	if (isError) {
-		return <Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10 }}>Перевірте з'днання з Інтернетом</Text>
+		statusServer(true);
+		return (
+			<View style={[styles.backgroundColor, styles.center]}>
+				<FlatListComponent data={localData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} />
+			</View>
+		);
 	};
 
 	return (
 		<SafeAreaView style={styles.center}>
+			{statusServer(false)}
 			<Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10 }}>Обрані ігри</Text>
-			{isLoading ? <Loader /> : <FlatListComponent data={data} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} />}
+			{(isLoading || isRefetching) ? <Loader /> : <FlatListComponent data={data} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} />}
 		</SafeAreaView>
 	);
 };

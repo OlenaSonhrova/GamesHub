@@ -32,6 +32,7 @@ const PrivacyPolicy = ({ navigation }) => {
 					flex: 1,
 					backgroundColor: '#DDA394',
 					justifyContent: 'center',
+					alignItems: 'center',
 				}}>
 				<Image
 					source={require('../image/success_icon.png')}
@@ -98,6 +99,24 @@ const styles = {
 		fontSize: 14,
 		color: '#FFF',
 		alignSelf: 'center',
+	},
+	successTextStyle: {
+		color: 'white',
+		textAlign: 'center',
+		fontSize: 18,
+		padding: 30,
+	},
+	buttonStyle: {
+		backgroundColor: 'black',
+		color: '#FFFFFF',
+		alignItems: 'center',
+		borderRadius: 30,
+
+	},
+	buttonTextStyle: {
+		color: '#FFFFFF',
+		padding: 20,
+		fontSize: 16,
 	},
 }
 

@@ -23,13 +23,13 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame }) => {
 		onClose();
 	};
 
-const selectGame = async (name, selected) => {
-	const response = await setSelectedGame(name, selected);
-	if (response !== 200) {
-		return;
+	const selectGame = async (name, selected) => {
+		const response = await setSelectedGame(name, selected);
+		if (response !== 200) {
+			return;
+		};
+		setSelectedHard(!selectedHard);
 	};
-	setSelectedHard(!selectedHard);
-};
 
 
 	return (
@@ -54,12 +54,12 @@ const selectGame = async (name, selected) => {
 						<View style={styles.headFlex}>
 							<Text style={styles.headText}>{gamePressed.name}</Text>
 							<View>
-								<Pressable onPress={() => selectGame(gamePressed.name, selectedHard)}>
+								<Pressable style={styles.faHeart} onPress={() => selectGame(gamePressed.name, selectedHard)}>
 									<FontAwesomeIcon icon={faHeart} size={30} color={selectedHard || selectedHard === undefined ? 'red' : 'black'} />
 								</Pressable>
 							</View>
 						</View>
-						<RatingGame idGame={gamePressed.name} userRating={gamePressed.user_rating}/>
+						<RatingGame idGame={gamePressed.name} userRating={gamePressed.user_rating} />
 					</View>
 					<View style={styles.body}>
 						<View style={styles.bodyIcon}>
@@ -108,13 +108,18 @@ const styles = StyleSheet.create({
 	},
 	arrowLeft: {
 		padding: 10,
+		paddingBottom: 0,
 	},
 	headFlex: {
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		paddingBottom: 30,
+	},
+	faHeart: {
+		padding: 30,
+		paddingLeft: 45,
+		paddingRight: 10,
 	},
 	headText: {
 		fontSize: 34,

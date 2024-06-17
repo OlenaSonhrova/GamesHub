@@ -3,20 +3,30 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { useNavigation } from '@react-navigation/native';
 
 
 import { logout } from '../api/api';
 
 
-const LogoutButton = ({ navigation }) => {
+const LogoutButton = ({ }) => {
+
+	const navigation = useNavigation();
 
 	const handleLogout = async () => {
-		const response = await logout();
-		if (response === 205) {
-			await AsyncStorage.removeItem('access');
-			await AsyncStorage.removeItem('refresh');
-			navigation.replace('Auth');
-		};
+		try {
+			const response = await logout();
+			if (response === 205) {
+				await AsyncStorage.removeItem('access');
+				await AsyncStorage.removeItem('refresh');
+				navigation.replace('Auth');
+			} else {
+				Alert.alert('Помилка', 'Сталася помилка при виході з системи.');
+			}
+		} catch (error) {
+			// console.error('Помилка під час виходу з системи:', error);
+			Alert.alert('Помилка', 'Сталася помилка при виході з системи.');
+		}
 	};
 
 	const showAlert = () => {

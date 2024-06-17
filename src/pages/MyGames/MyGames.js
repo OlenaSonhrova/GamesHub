@@ -1,31 +1,50 @@
 import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery } from '@tanstack/react-query';
-import { Pressable, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet, Text, View, BackHandler } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {faCirclePlus, faCircleMinus } from '@fortawesome/free-solid-svg-icons';
+import { faCirclePlus, faCircleMinus } from '@fortawesome/free-solid-svg-icons';
 
 import AddGame from './addGames';
 import Loader from '../../registration/components/loader';
 import { GetUserCreatedGames } from '../../api/api';
 import FlatListInMyGame from '../commons/flatListInMyGame';
+import { useFocusEffect } from '@react-navigation/native';
 
 
-const MyGamess = ({ navigation }) => {
+const MyGamess = ({ navigation, offline, statusServer }) => {
 
 	const imageLocal = require('../../image/myGame.png');
 	const [addGameVisible, setAddGameVisible] = useState(false);
 	const [newData, setNewData] = useState(data);
 	const [newItem, setNewItem] = useState();
 	const [upDate, setUpDate] = useState(false);
+	const [localData, setLocalData] = useState([]);
 
-	const { data, isLoading, isError, refetch } = useQuery(
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await AsyncStorage.getItem('CreatedGames');
+			const games = JSON.parse(response);
+			setLocalData(games);
+		};
+		fetchData();
+	}, []);
+
+	useEffect(() => {
+		if (offline) {
+		} else {
+			refetch();
+		}
+	}, [offline]);
+
+	const { data, isLoading, isError, isRefetching, refetch } = useQuery(
 		{
 			queryKey: ["GetUserCreatedGames"],
 			queryFn: () => GetUserCreatedGames('/core/getUserCreatedGames/', navigation),
 			retry: 2,
 		},
 	);
-	
+
 	useEffect(() => {
 		setNewData(data);
 	}, [data]);
@@ -34,10 +53,19 @@ const MyGamess = ({ navigation }) => {
 		await refetch();
 	};
 
-	if (isError) {
-		return <Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10, height: '100%'}} onPress={handleRefresh}>Перевірте з'днання з Інтернетом</Text>
-	};
+	useFocusEffect(
+		React.useCallback(() => {
+			if (!offline) {
+				refetch();
+			};
+		}, [refetch, offline])
+	);
 
+	useEffect(() => {
+		if (!addGameVisible) {
+			refetch();
+		}
+	}, [addGameVisible, refetch]);
 
 	const returnedDataAdd = async (newGame) => {
 		setAddGameVisible(!addGameVisible);
@@ -55,22 +83,47 @@ const MyGamess = ({ navigation }) => {
 		};
 	};
 
-
 	const returnedClickUpDate = (item) => {
 		setAddGameVisible(!addGameVisible);
 		setUpDate(!upDate);
 		setNewItem(item);
 	};
 
+	useEffect(() => {
+		const backHandler = () => {
+			if (addGameVisible) {
+				setAddGameVisible(false);
+				console.log('умови дві +');
+				return true;
+			}
+			return false;
+		};
+		BackHandler.addEventListener('hardwareBackPress', backHandler);
+		return () => {
+			BackHandler.removeEventListener('hardwareBackPress', backHandler);
+		};
+	}, [addGameVisible]);
+
+	if (isError) {
+		statusServer(true);
+		return (
+			<SafeAreaView style={[styles.backgroundColor, styles.center]}>
+				<FlatListInMyGame data={localData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} />
+			</SafeAreaView>
+		);
+	};
+
+
 	return (
 		<SafeAreaView style={styles.backgroundColor}>
+			{statusServer(false)}
 			<Pressable style={styles.addGameBlock} onPress={() => { setAddGameVisible(!addGameVisible) }}>
 				<Text style={styles.addGameText}>Додати гру</Text>
 				<FontAwesomeIcon icon={addGameVisible ? faCircleMinus : faCirclePlus} size={30} color='#8D6349' />
 			</Pressable>
 			{addGameVisible ? <AddGame returnedDataAdd={returnedDataAdd} returnedDataUp={returnedDataUp} item={newItem} upDate={upDate} /> : null}
 			<View style={styles.center}>
-				{isLoading ? <Loader /> : <FlatListInMyGame data={newData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} />}
+				{(isLoading || isRefetching) ? <Loader /> : <FlatListInMyGame data={newData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} />}
 			</View>
 		</SafeAreaView>
 	);

@@ -103,7 +103,6 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate }) 
 				money_range: selectedMoney,
 				is_private: toggleSwitch
 			});
-			console.log('setAnimating 2');
 			const nameUrl = '/core/updateUserGame/';
 			const response = await UpdateUserGame(nameUrl, body, navigation);
 			if (response?.status !== 200 && response?.status !== 201) {
@@ -321,7 +320,11 @@ const styles = StyleSheet.create({
 	blockText: {
 		textAlign: 'center',
 		margin: 8,
+	},
+	valueText: {
 		fontWeight: 'bold',
+		fontSize: 20,
+		paddingTop: 10,
 	},
 	containerSwitch: {
 		display: 'flex',

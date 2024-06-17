@@ -5,9 +5,12 @@ import { useQuery } from '@tanstack/react-query';
 import Loader from '../../registration/components/loader';
 import { getAllGameTypes } from '../../api/api';
 import LocalStorage from '../../Localstorege/LocalStorege';
+import { useNavigation } from '@react-navigation/native';
 
 
-const Games = ({ navigation }) => {
+const Games = ({ offline, statusServer }) => {
+
+	const navigation = useNavigation();
 
 	const [localData, setLocalData] = useState([]);
 
@@ -19,6 +22,14 @@ const Games = ({ navigation }) => {
 		};
 		fetchData();
 	}, []);
+
+	useEffect(() => {
+		if (offline) {
+		} else {
+			refetch();
+		}
+	}, [offline]);
+
 
 	const { data, isLoading, isError, refetch } = useQuery(
 		{
@@ -36,13 +47,12 @@ const Games = ({ navigation }) => {
 		return <Loader />;
 	};
 
-
 	if (isError) {
+		statusServer(true);
 		return (
 			<View style={styles.backgroundColor}>
 				<SafeAreaView style={styles.container}>
 					<Text style={styles.titleBlock}>КАТЕГОРІЇ</Text>
-					<Text style={{paddingBottom: 10}}>Дані показані з кешу. Перевірте з'днання з Інтернетом</Text>
 					<FlatList
 						data={localData?.types}
 						refreshControl={
@@ -76,9 +86,9 @@ const Games = ({ navigation }) => {
 		);
 	};
 
-
 	return (
 		<View style={styles.backgroundColor}>
+			{statusServer(false)}
 			<SafeAreaView style={styles.container}>
 				<Text style={styles.titleBlock}>КАТЕГОРІЇ</Text>
 				<FlatList
@@ -137,6 +147,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		gap: 10,
+		paddingVertical: 12,
+
 	},
 	blockText: {
 		display: 'flex',
