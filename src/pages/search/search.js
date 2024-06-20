@@ -66,8 +66,15 @@ const Search = ({ navigation, offline, statusServer }) => {
 		};
 	};
 
+	// useEffect(() => {
+	// 	getDataInfa();
+	// }, [offline]);
+
 	useEffect(() => {
-		getDataInfa();
+		if (offline) {
+		} else {
+			getDataInfa();
+		}
 	}, [offline]);
 
 	useEffect(() => {
@@ -115,14 +122,12 @@ const Search = ({ navigation, offline, statusServer }) => {
 		<SafeAreaView style={styles.backgroundColor}>
 			{offline ? (
 				<>
-					{statusServer(true)}
 					<Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10 }}>
 						Функція пошуку доступа тільки в онлайні
 					</Text>
 				</>
 			) : (
 				<View>
-					{statusServer(false)}
 					<View style={styles.request}>
 						<Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10 }}>Пошук ігор</Text>
 						<View style={styles.blockOne} >

@@ -26,12 +26,6 @@ const Likedd = ({ navigation, offline, statusServer }) => {
 		fetchData();
 	}, []);
 
-	useEffect(() => {
-		if (offline) {
-		} else {
-			refetch();
-		}
-	}, [offline]);
 
 	const { data, isLoading, isError, isRefetching, refetch } = useQuery(
 		{
@@ -41,8 +35,25 @@ const Likedd = ({ navigation, offline, statusServer }) => {
 		},
 	);
 
+	useEffect(() => {
+		if (offline) {
+		} else {
+			refetch();
+		}
+	}, [offline]);
+
+	useEffect(() => {
+		if (isError) {
+			statusServer(true);
+		}
+	}, [isError]);
+
+
 	const handleRefresh = async () => {
-		await refetch();
+		if (offline) {
+		} else {
+			await refetch();
+		};
 	};
 
 	useFocusEffect(
@@ -53,20 +64,21 @@ const Likedd = ({ navigation, offline, statusServer }) => {
 		}, [refetch, offline])
 	);
 
-	if (isError) {
-		statusServer(true);
+	if (isError || offline) {
 		return (
 			<View style={[styles.backgroundColor, styles.center]}>
-				<FlatListComponent data={localData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} />
+				<Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10 }}>Обрані ігри</Text>
+				<FlatListComponent data={localData} onRefresh={handleRefresh} imageLocal={imageLocal} offline={offline}/>
 			</View>
 		);
 	};
 
+
 	return (
 		<SafeAreaView style={styles.center}>
-			{statusServer(false)}
 			<Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10 }}>Обрані ігри</Text>
-			{(isLoading || isRefetching) ? <Loader /> : <FlatListComponent data={data} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} />}
+			{(isLoading) ? <Loader /> : <FlatListComponent data={data} refreshing={isRefetching} onRefresh={handleRefresh} imageLocal={imageLocal} offline={offline}/>}
+			{/* {(isLoading || isRefetching) ? <Loader /> : <FlatListComponent data={data} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} />} */}
 		</SafeAreaView>
 	);
 };

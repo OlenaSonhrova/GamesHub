@@ -18,21 +18,26 @@ const RegisterScreen = ({ navigation }) => {
 
 
 	const handleSubmitButton = async () => {
-		if (!userName) { alert('Please fill Name'); return; };
-		if (!userEmail) { alert('Please fill Email'); return; };
-		if (!userPassword) { alert('Please fill Password'); return; };
+		if (!userName) { alert('Будь ласка, введіть Nickname'); return; };
+		if (!userEmail) { alert('Будь ласка, заповніть Email'); return; };
+		if (!userPassword) { alert('Будь ласка, заповніть Пароль'); return; };
 		setLoading(true);
 		try {
-			setUserName(' ');
-			setUserEmail(' ');
-			setUserPassword(' ');
 			const response = await Register(userName, userEmail, userPassword);
-			console.log('response in coponent register', response)
+			const jsonData = await response.json();
+			if (jsonData?.email[0] === 'custom user with this email already exists.' || jsonData?.username[0] === 'custom user with this username already exists.'){
+				setLoading(false);
+				alert('Щось пішло не так. Користувач з таким Email або Nickname вже існує. Спробуйте ще раз'); return;
+			};
+			if (response?.status !== 200 && response?.status !== 201) {
+				setLoading(false);
+				alert('Сервер не відповідає! спробуйте ще раз'); return;
+			};
 			setLoading(false);
 			navigation.replace('PrivacyPolicy');
 		} catch (error) {
 			console.error(error);
-			alert('Opssss. handleSubmitButton', error);
+			alert('Opssss. Щось пішло не так', error);
 			setLoading(false);
 		};
 	};
@@ -63,7 +68,7 @@ const RegisterScreen = ({ navigation }) => {
 							style={styles.inputStyle}
 							onChangeText={(UserName) => setUserName(UserName)}
 							underlineColorAndroid="#f000"
-							placeholder="Enter Name"
+							placeholder="Enter Nickname"
 							placeholderTextColor="#ffffff"
 							autoCapitalize="sentences"
 							returnKeyType="next"

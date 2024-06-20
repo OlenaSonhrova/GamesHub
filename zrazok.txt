@@ -34,7 +34,7 @@ npx kill-port 3000     - зупинити процес на порту
 npm start -- --reset-cache
 
 > Task :react-native-reanimated:buildCMakeRelWithDebInfo[armeabi-v7a] FAILED
-cd android ./gradlew clean
+cd android &&./gradlew clean
 
 
 [TypeError: Network request failed}

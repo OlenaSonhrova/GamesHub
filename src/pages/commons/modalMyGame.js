@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart, faPenToSquare, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile } from '@fortawesome/free-solid-svg-icons';
 
 
-import RatingGame from './raiting';
 
 
-const ModalMyGame = ({ gamePressed, onClose, imageLocal, returnedClickUpDate }) => {
+const ModalMyGame = ({ gamePressed, onClose, imageLocal, returnedClickUpDate, offline }) => {
 
 	const [modalVisible, setModalVisible] = useState(true);
 
@@ -22,6 +21,10 @@ const ModalMyGame = ({ gamePressed, onClose, imageLocal, returnedClickUpDate }) 
 	};
 
 	const upDateUserGame = (item) => {
+		if(offline) {
+			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
+			return;
+		};
 		returnedClickUpDate(item);
 		setModalVisible(false);
 		onClose();

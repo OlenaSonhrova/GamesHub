@@ -13,33 +13,26 @@ import { ChangeInternet } from "../../api/api";
 
 const Tab = createBottomTabNavigator();
 
-const BottomTabNavigator = ({ navigation, statusServer, offline }) => {
+const BottomTabNavigator = ({ navigation, statusServer, offline, isLoading, changeInternet }) => {
 
-	// const [activitiIndi, setActivitiIndi] = useState(false);
-
-	const reboot = async () => {
-		// setActivitiIndi(true);
-		const response = await ChangeInternet(navigation);
-		if (response === 200) {
-			statusServer(false);
-		} else {
-			statusServer(true);
-		};
-		// setActivitiIndi(false);
-	};
+	const [isOffline, setIsOffline] = useState(offline);
 
 	useEffect(() => {
-		const fetchData = async () => {
-			await reboot();
-		};
-		fetchData();
-	}, []);
+		setIsOffline(offline);
+	}, [offline]);
 
 	return (
 		<Tab.Navigator initialRouteName="HomeTab"
 			screenOptions={{
 				tabBarActiveTintColor: '#B66A53',
-				headerShown: offline,
+				headerShown: isOffline,
+				// header: () => {
+				// 	if (offline) {
+				// 		return <OnlineOffline changeInternet={changeInternet} />;
+				// 	} else {
+				// 		return null;
+				// 	}
+				// },
 			}}>
 			<Tab.Screen name="GamesTab" options={{
 				tabBarLabel: 'Games',
@@ -47,9 +40,7 @@ const BottomTabNavigator = ({ navigation, statusServer, offline }) => {
 					<FontAwesomeIcon icon={faFolder} color={color} />
 				),
 				header: () => (
-					<Pressable onPress={reboot} >
-						<OnlineOffline />
-					</Pressable>
+					<OnlineOffline changeInternet={changeInternet} isLoading={isLoading}/>
 				),
 			}} >
 				{() => <GamesStackNavigator offline={offline} statusServer={statusServer} />}
@@ -60,9 +51,7 @@ const BottomTabNavigator = ({ navigation, statusServer, offline }) => {
 					<FontAwesomeIcon icon={faSearch} color={color} />
 				),
 				header: () => (
-					<Pressable onPress={reboot} >
-						<OnlineOffline />
-					</Pressable>
+					<OnlineOffline changeInternet={changeInternet} isLoading={isLoading} />
 				),
 			}}>
 				{() => <SearchStackNavigator offline={offline} statusServer={statusServer} />}
@@ -82,9 +71,7 @@ const BottomTabNavigator = ({ navigation, statusServer, offline }) => {
 					<FontAwesomeIcon icon={faHeart} color={color} />
 				),
 				header: () => (
-					<Pressable onPress={reboot} >
-						<OnlineOffline />
-					</Pressable>
+					<OnlineOffline changeInternet={changeInternet} isLoading={isLoading} />
 				),
 			}}>
 				{() => <Liked offline={offline} statusServer={statusServer} />}
@@ -95,9 +82,7 @@ const BottomTabNavigator = ({ navigation, statusServer, offline }) => {
 					<FontAwesomeIcon icon={faCirclePlus} color={color} />
 				),
 				header: () => (
-					<Pressable onPress={reboot} >
-						<OnlineOffline />
-					</Pressable>
+					<OnlineOffline changeInternet={changeInternet}  />
 				),
 			}} >
 				{() => <MyGames offline={offline} statusServer={statusServer} />}

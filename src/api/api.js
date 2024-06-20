@@ -105,10 +105,9 @@ const LoginUser = async (userEmail, userPassword) => {
 			},
 			body: body
 		});;
-		const jsonData = await response.json();
-		return jsonData;
+		return response;
 	} catch (error) {
-		alert(`Не правильний Password або Email in API\n${error}`);
+		alert(`Opssss. Щось пішло не так`);
 		throw error;
 	};
 };
@@ -117,6 +116,7 @@ const GetUserInfo = async (navigation) => {
 	const nameUrl = '/users/info/';
 	try {
 		const response = await baseGet(nameUrl, navigation);
+		await AsyncStorage.setItem('userInfo', JSON.stringify(response));
 		return response;
 	} catch (error) {
 		console.error('Error GetUserInfo data:', error);
@@ -160,8 +160,7 @@ const Register = async (userName, userEmail, userPassword) => {
 			},
 			body: body
 		});;
-		const jsonData = await response.json();
-		return jsonData;
+		return response;
 	} catch (error) {
 		console.error('Error logout data:', error);
 		throw error;
@@ -171,6 +170,7 @@ const Register = async (userName, userEmail, userPassword) => {
 const getAllGameTypes = async (nameUrl, navigation) => {
 	try {
 		const response = await baseGet(nameUrl, navigation);
+		// console.log('response', response);
 		await AsyncStorage.setItem('AllTypes', JSON.stringify(response));
 		return response;
 	} catch (error) {
@@ -345,7 +345,7 @@ const UpdateUserGame = async (nameUrl, body, navigation) => {
 		const response = await basePost(url, body, navigation);
 		return response;
 	} catch (error) {
-		console.log('Opssss.DeleteUserGame');
+		console.log('Opssss.UpdateUserGame');
 		throw error;
 	};
 };
@@ -360,10 +360,17 @@ const ChangeInternet = async () => {
 			headers: {
 				'Authorization': `Bearer ${access}`,
 				'Content-Type': 'application/json'
-			}
+			},
+			timeout: 5000
 		});
 		console.log('finish in ChangeInternet', nameUrl, response?.status);
 		return response?.status ;
+		// throw new Error('Simulated error');
+		// if (Math.random() < 0.5) {
+		// 	throw new Error('Simulated error');
+		// } else {
+		// 	return response?.status;
+		// }
 	} catch (error) {
 		console.error('Error baseGet data:', error);
 		throw error;

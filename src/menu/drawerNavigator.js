@@ -1,26 +1,48 @@
-import { SafeAreaView, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { Alert, SafeAreaView, StyleSheet } from "react-native";
 import { DrawerContentScrollView, DrawerItemList, createDrawerNavigator } from "@react-navigation/drawer";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleQuestion, faArrowLeft, faHandshakeSimple, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { useQuery } from '@tanstack/react-query';
 
+import { ChangeInternet } from "../api/api";
 import BottomTabNavigator from "../pages/commons/TabNavigation";
 import Help from "./help";
 import AboutApplication from "./aboutApplication";
 import UserAgreement from "./userAgreement";
 import UserProfileHeader from "./UserProfileHeader";
 import LogoutButton from "./LogoutButton";
-import { useState } from "react";
 
 const Drawer = createDrawerNavigator();
 
-const DrawerNavigator = () => {
+const DrawerNavigator = ({ navigation }) => {
 
 	const [offline, setOffline] = useState(true);
 
+
 	const statusServer = (statusNow) => {
-		// console.log('statusServer', statusNow);
 		setOffline(statusNow);
 	};
+
+	const { data,  isError, refetch } = useQuery(
+		{
+			queryKey: ["changeInternet"],
+			queryFn: () => ChangeInternet(navigation),
+			retry: 2,
+		},
+	);
+
+	useEffect(() => {
+		statusServer(!!isError);
+		// console.log('isError', !!isError);
+		// Alert.alert('Infa', 'status offline', offline);
+	}, [isError]);
+
+	const changeInternet = async () => {
+		await refetch();
+	};
+
+
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -49,7 +71,7 @@ const DrawerNavigator = () => {
 					drawerLabelStyle: { color: 'black', fontWeight: '400' },
 					drawerIcon: () => <FontAwesomeIcon icon={faArrowLeft} size={25} color='#8D6349' />,
 				}}>
-					{() => <BottomTabNavigator offline={offline} statusServer={statusServer}/>}
+					{() => <BottomTabNavigator offline={offline} statusServer={statusServer} changeInternet={changeInternet} />}
 				</Drawer.Screen>
 				<Drawer.Screen name="Help" component={Help}
 					options={{

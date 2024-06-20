@@ -11,7 +11,7 @@ const LocalStorage = ({ navigation }) => {
 		// console.log('checkPeriod 1', checkPeriod);
 		if (checkPeriod) {
 			const CLEAR_INTERVAL = 15552000000;
-			// const CLEAR_INTERVAL = 143461;
+			// const CLEAR_INTERVAL = 345;
 			// console.log('checkPeriod 2', checkPeriod);
 			const period = Date.now() - parseInt(checkPeriod, 10);
 			// console.log('period 1', period);

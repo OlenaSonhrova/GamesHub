@@ -9,7 +9,7 @@ const UserProfileHeader = ({ navigation }) => {
 
 	const [localData, setLocalData] = useState([]);
 
-	const { data } = useQuery(
+	const { data, isError } = useQuery(
 		{
 			queryKey: ["getUserInfo"],
 			queryFn: () => GetUserInfo(navigation),
@@ -25,6 +25,20 @@ const UserProfileHeader = ({ navigation }) => {
 			}
 		});
 	}, []);
+
+	if (isError) {
+		return (
+			<View style={styles.container}>
+				<View style={styles.logo}>
+					<Image source={require('../image/online.png')}></Image>
+				</View>
+				<View style={styles.infa}>
+					<Text style={styles.text} numberOfLines={1} ellipsizeMode="tail"> <Text style={{ fontSize: 18, fontWeight: '900' }}>User:</Text> {localData?.user?.username}</Text>
+					<Text style={styles.text} numberOfLines={1} ellipsizeMode="tail"> <Text style={{ fontSize: 18, fontWeight: '900' }}>Email:</Text> {localData?.user?.email}</Text>
+				</View>
+			</View>
+		);
+	};
 
 	return (
 		<View style={styles.container}>

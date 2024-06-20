@@ -23,13 +23,6 @@ const Games = ({ offline, statusServer }) => {
 		fetchData();
 	}, []);
 
-	useEffect(() => {
-		if (offline) {
-		} else {
-			refetch();
-		}
-	}, [offline]);
-
 
 	const { data, isLoading, isError, refetch } = useQuery(
 		{
@@ -39,6 +32,20 @@ const Games = ({ offline, statusServer }) => {
 		},
 	);
 
+	useEffect(() => {
+		if (offline) {
+		} else {
+			refetch();
+		}
+	}, [offline]);
+
+	useEffect(() => {
+		if (isError) {
+			statusServer(true);
+		}
+	}, [isError]);
+
+
 	const handleRefresh = async () => {
 		await refetch();
 	};
@@ -47,8 +54,7 @@ const Games = ({ offline, statusServer }) => {
 		return <Loader />;
 	};
 
-	if (isError) {
-		statusServer(true);
+	if (isError || offline) {
 		return (
 			<View style={styles.backgroundColor}>
 				<SafeAreaView style={styles.container}>
@@ -86,9 +92,9 @@ const Games = ({ offline, statusServer }) => {
 		);
 	};
 
+
 	return (
 		<View style={styles.backgroundColor}>
-			{statusServer(false)}
 			<SafeAreaView style={styles.container}>
 				<Text style={styles.titleBlock}>КАТЕГОРІЇ</Text>
 				<FlatList

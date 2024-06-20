@@ -7,7 +7,7 @@ import { DeleteUserGame } from '../../api/api';
 import ModalMyGame from './modalMyGame';
 
 
-const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imageLocal, returnedClickUpDate }) => {
+const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imageLocal, returnedClickUpDate, offline }) => {
 
 	const [gamePressed, setGamePressed] = useState(null);
 	const [newData, setNewData] = useState(data);
@@ -22,6 +22,10 @@ const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imag
 	};
 
 	const deleteUserGame = async (idGame) => {
+		if (offline) {
+			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
+			return;
+		};
 		Alert.alert('Ви впевнені, що хочете видалити гру?', 'Гра видаляється назавжди', [
 			{
 				text: 'Cancel',
@@ -36,7 +40,6 @@ const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imag
 						return;
 					};
 					const updatedGames = newData.filter((game) => game.name !== idGame);
-					// const updatedGames = data.filter((game) => game.name!== idGame);
 					setNewData(updatedGames);
 				}
 			},
@@ -44,6 +47,10 @@ const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imag
 	};
 
 	const upDateUserGame = (item) => {
+		if (offline) {
+			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
+			return;
+		};
 		returnedClickUpDate(item);
 	};
 
@@ -99,7 +106,7 @@ const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imag
 				)}
 			/>
 			{
-				gamePressed && (<ModalMyGame gamePressed={gamePressed} onClose={() => setGamePressed(null)} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} />
+				gamePressed && (<ModalMyGame gamePressed={gamePressed} onClose={() => setGamePressed(null)} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} offline={offline}/>
 				)}
 		</View>
 	);

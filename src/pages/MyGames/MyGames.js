@@ -30,12 +30,6 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 		fetchData();
 	}, []);
 
-	useEffect(() => {
-		if (offline) {
-		} else {
-			refetch();
-		}
-	}, [offline]);
 
 	const { data, isLoading, isError, isRefetching, refetch } = useQuery(
 		{
@@ -46,11 +40,28 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 	);
 
 	useEffect(() => {
+		if (offline) {
+		} else {
+			refetch();
+		}
+	}, [offline]);
+
+	useEffect(() => {
+		if (isError) {
+			statusServer(true);
+		}
+	}, [isError]);
+
+
+	useEffect(() => {
 		setNewData(data);
 	}, [data]);
 
 	const handleRefresh = async () => {
-		await refetch();
+		if (offline) {
+		} else {
+			await refetch();
+		};
 	};
 
 	useFocusEffect(
@@ -66,6 +77,8 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 			refetch();
 		}
 	}, [addGameVisible, refetch]);
+
+
 
 	const returnedDataAdd = async (newGame) => {
 		setAddGameVisible(!addGameVisible);
@@ -104,11 +117,11 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 		};
 	}, [addGameVisible]);
 
-	if (isError) {
-		statusServer(true);
+	if (isError || offline) {
 		return (
 			<SafeAreaView style={[styles.backgroundColor, styles.center]}>
-				<FlatListInMyGame data={localData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} />
+				<Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10 }}>Мої ігри</Text>
+				<FlatListInMyGame data={localData} onRefresh={handleRefresh} imageLocal={imageLocal} offline={offline}/>
 			</SafeAreaView>
 		);
 	};
@@ -116,14 +129,14 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 
 	return (
 		<SafeAreaView style={styles.backgroundColor}>
-			{statusServer(false)}
 			<Pressable style={styles.addGameBlock} onPress={() => { setAddGameVisible(!addGameVisible) }}>
 				<Text style={styles.addGameText}>Додати гру</Text>
 				<FontAwesomeIcon icon={addGameVisible ? faCircleMinus : faCirclePlus} size={30} color='#8D6349' />
 			</Pressable>
-			{addGameVisible ? <AddGame returnedDataAdd={returnedDataAdd} returnedDataUp={returnedDataUp} item={newItem} upDate={upDate} /> : null}
+			{addGameVisible ? <AddGame returnedDataAdd={returnedDataAdd} returnedDataUp={returnedDataUp} item={newItem} upDate={upDate} offline={offline} /> : null}
 			<View style={styles.center}>
-				{(isLoading || isRefetching) ? <Loader /> : <FlatListInMyGame data={newData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} />}
+				{(isLoading) ? <Loader /> : <FlatListInMyGame data={newData} refreshing={isRefetching} onRefresh={handleRefresh} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} offline={offline}/>}
+				{/* {(isLoading || isRefetching) ? <Loader /> : <FlatListInMyGame data={newData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} />} */}
 			</View>
 		</SafeAreaView>
 	);
@@ -134,7 +147,7 @@ const styles = StyleSheet.create({
 		margin: 10,
 	},
 	backgroundColor: {
-		backgroundColor: '#FFFAF5',
+		// backgroundColor: '#FFFAF5',
 		height: '100%',
 	},
 	addGameBlock: {

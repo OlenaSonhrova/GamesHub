@@ -31,15 +31,15 @@ const LogoutButton = ({ }) => {
 
 	const showAlert = () => {
 		Alert.alert(
-			'Logout',
-			'Are you sure? You want to logout?',
+			'Вихід',
+			'Ви впевнені що хочете вийти?',
 			[
 				{
-					text: 'Cancel',
+					text: 'Ні',
 					onPress: () => null,
 				},
 				{
-					text: 'Confirm',
+					text: 'Так',
 					onPress: handleLogout,
 				},
 			],
@@ -52,7 +52,7 @@ const LogoutButton = ({ }) => {
 			<View style={{ marginRight: 10 }}>
 				<FontAwesomeIcon icon={faArrowRightFromBracket} size={25} color='#8D6349' />
 			</View>
-			<Text style={{ color: 'black', fontSize: 14, }}>Logout</Text>
+			<Text style={{ color: 'black', fontSize: 14, }}>Вихід</Text>
 		</TouchableOpacity>
 	);
 };

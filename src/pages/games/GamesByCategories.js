@@ -14,19 +14,28 @@ const GamesByCategories = ({ navigation, offline, statusServer }) => {
 	const route = useRoute();
 	const type = route.params.type;
 	const image = route.params.image;
+
 	
+
 	const [localData, setLocalData] = useState([]);
 
 	useEffect(() => {
 		const fetchData = async () => {
 			const response = await AsyncStorage.getItem(type);
 			const games = JSON.parse(response);
-			// console.log('type', type);
-			// console.log('games', games);
 			setLocalData(games);
 		};
 		fetchData();
 	}, []);
+
+
+	const { data, isLoading, isError, isRefetching, refetch } = useQuery(
+		{
+			queryKey: ["GetAllGames"],
+			queryFn: () => GetAllGames((navigation)),
+			retry: 1,
+		},
+	);
 
 	useEffect(() => {
 		if (offline) {
@@ -35,40 +44,43 @@ const GamesByCategories = ({ navigation, offline, statusServer }) => {
 		}
 	}, [offline]);
 
-	const { data, isLoading, isError, isRefetching, refetch } = useQuery(
-		{
-			queryKey: ["GetAllGames"],
-			queryFn: () => GetAllGames((navigation)),
-			retry: 2,
-		},
-	);
+	useEffect(() => {
+		if (isError) {
+			statusServer(true);
+		}
+	}, [isError]);
+
 
 	const handleRefresh = async () => {
-		await refetch();
+		if (offline) {
+		} else {
+			await refetch();
+		};
 	};
 
-	useFocusEffect(
-		React.useCallback(() => {
-			if (!offline) {
-				refetch();
-			};
-		}, [refetch, offline])
-	);
+	// useFocusEffect(
+	// 	React.useCallback(() => {
+	// 		if (!offline) {
+	// 			refetch();
+	// 		};
+	// 	}, [refetch, offline])
+	// );
 
 
-	if (isError) {
-		statusServer(true);
+	if (isError || offline) {
 		return (
-			<View style={styles.backgroundColor}>
-				<FlatListComponent data={localData} refreshing={isLoading} onRefresh={handleRefresh} image={image} />
+			<View style={styles.block}>
+				<FlatListComponent data={localData} onRefresh={handleRefresh} image={image} offline={offline}/>
 			</View>
 		);
 	};
 
+
+
 	return (
 		<View style={styles.block}>
-			{statusServer(false)}
-			{(isLoading || isRefetching) ? <Loader /> : <FlatListComponent data={data?.new_games[type]} refreshing={isLoading} onRefresh={handleRefresh} image={image} />}
+			{(isLoading) ? <Loader /> : <FlatListComponent data={data?.new_games[type]} refreshing={isRefetching} onRefresh={handleRefresh} image={image} offline={offline}/>}
+			{/* {(isLoading || isRefetching) ? <Loader /> : <FlatListComponent data={data?.new_games[type]} refreshing={isLoading} onRefresh={handleRefresh} image={image} />} */}
 		</View>
 	);
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile } from '@fortawesome/free-solid-svg-icons';
 
@@ -7,7 +7,7 @@ import { faHeart, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile 
 import RatingGame from './raiting';
 
 
-const ModalComponent = ({ gamePressed, onClose, setSelectedGame }) => {
+const ModalComponent = ({ gamePressed, onClose, setSelectedGame, offline }) => {
 
 	const [modalVisible, setModalVisible] = useState(true);
 
@@ -17,18 +17,40 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame }) => {
 	};
 
 	const [selectedHard, setSelectedHard] = useState(gamePressed.is_selected);
+	const [hasInteracted, setHasInteracted] = useState(false);
+	const [hasInteractedRating, setHasInteractedRating] = useState(false);
+
+	const checkChangeUserRating = (rating) => {
+		if (rating !== gamePressed.user_rating) {
+			setHasInteractedRating(true);
+		} else {
+			setHasInteractedRating(false);
+		};
+	};
 
 	const closeModal = () => {
 		setModalVisible(false);
-		onClose();
+		if (hasInteracted || hasInteractedRating) {
+			onClose(true);
+		} else {
+			onClose(false);
+		};
 	};
 
 	const selectGame = async (name, selected) => {
-		const response = await setSelectedGame(name, selected);
+		if (offline) {
+			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
+			return;
+		};
+		const isSelected = selected !== undefined ? selected : (setSelectedHard(false), true);
+		const response = await setSelectedGame(name, isSelected);
 		if (response !== 200) {
 			return;
 		};
-		setSelectedHard(!selectedHard);
+		setHasInteracted(!hasInteracted);
+		if (selected !== undefined) {
+			setSelectedHard(!selectedHard);
+		}
 	};
 
 
@@ -59,7 +81,7 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame }) => {
 								</Pressable>
 							</View>
 						</View>
-						<RatingGame idGame={gamePressed.name} userRating={gamePressed.user_rating} />
+						<RatingGame idGame={gamePressed.name} userRating={gamePressed.user_rating} checkChangeUserRating={checkChangeUserRating} offline={offline} />
 					</View>
 					<View style={styles.body}>
 						<View style={styles.bodyIcon}>

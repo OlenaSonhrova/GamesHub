@@ -7,7 +7,7 @@ import { faStar, faHeart } from '@fortawesome/free-solid-svg-icons';
 import ModalComponent from './modal';
 import { RemoveSelectedGame, SelectedGame } from '../../api/api';
 
-const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, imageLocal }) => {
+const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, imageLocal, offline }) => {
 
 	const [gamePressed, setGamePressed] = useState(null);
 	const [newData, setNewData] = useState(data);
@@ -21,6 +21,10 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 	};
 
 	const setSelectedGame = async (idGame, selected) => {
+		if (offline) {
+			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
+			return;
+		};
 		if (selected) {
 			const response = await RemoveSelectedGame(idGame, navigation);
 			if (response?.status !== 200) {
@@ -49,6 +53,10 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 	};
 
 	const setRemoveGame = async (idGame) => {
+		if (offline) {
+			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
+			return;
+		};
 		const response = await RemoveSelectedGame(idGame, navigation);
 		if (response?.status !== 200) {
 			Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
@@ -118,7 +126,8 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 				)}
 			/>
 			{
-				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={() => { setGamePressed(null); onRefresh(); }} setSelectedGame={setSelectedGame} />
+				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={(hasInteracted) => { setGamePressed(null); if (hasInteracted) {onRefresh();}}} setSelectedGame={setSelectedGame} offline={offline}/>
+					// gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={() => { setGamePressed(null); onRefresh(); }} setSelectedGame={setSelectedGame} />
 				)}
 		</View>
 	);

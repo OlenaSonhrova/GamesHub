@@ -6,7 +6,7 @@ import Loader from '../../registration/components/loader';
 
 
 
-const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate }) => {
+const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, offline }) => {
 
 	const [name, setName] = useState('');
 	const [oldName, setOldName] = useState('');
@@ -73,6 +73,13 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate }) 
 	useEffect(() => {
 		getDataInfa();
 	}, []);
+
+	useEffect(() => {
+		if (offline) {
+		} else {
+			getDataInfa();
+		}
+	}, [offline]);
 
 
 	const addGame = async () => {

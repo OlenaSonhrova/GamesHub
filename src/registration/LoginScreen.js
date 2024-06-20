@@ -18,10 +18,8 @@ const LoginScreen = ({ navigation }) => {
 		const getUserCredentials = async () => {
 			try {
 				const userEmails = await AsyncStorage.getItem('userEmail');
-				const userPasswords = await AsyncStorage.getItem('userPassword');
 				if (userEmails) {
 					setUserEmail(userEmails);
-					setUserPassword(userPasswords);
 				};
 			} catch (error) {
 				console.error('Error getting user credentials:', error);
@@ -32,23 +30,31 @@ const LoginScreen = ({ navigation }) => {
 	}, []);
 
 	const handleSubmitPress = async () => {
-		if (!userEmail) { alert('Будь ласка, заповніть Email'); return; };
+		if (!userEmail) { alert('Будь ласка, заповніть Nickname'); return; };
 		if (!userPassword) { alert('Будь ласка, заповніть Password'); return; };
 		setLoading(true);
-		const response = await LoginUser(userEmail, userPassword);
-		if (response?.non_field_errors) {
-			setLoading(false);
-			alert('Не правильний Password або Email');
-			navigation.replace('LoginScreen');
-			setUserEmail(' ');
-			setUserPassword(' ');
-		} else {
-			await AsyncStorage.setItem('access', response?.access);
-			await AsyncStorage.setItem('refresh', response?.refresh);
-			await AsyncStorage.setItem('userEmail', userEmail);
-			await AsyncStorage.setItem('userPassword', userPassword);
-			setLoading(false);
-			navigation.replace('DrawerNavigator');
+		try {
+			const response = await LoginUser(userEmail, userPassword);
+			const jsonData = await response.json();
+			if (jsonData?.non_field_errors) {
+				alert('Не правильний Password або Nickname');
+				setLoading(false);
+				return;
+			} else if (response?.status !== 200) {
+				alert('Сервер не відповідає! спробуйте ще раз');
+				setLoading(false);
+				return;
+			} else {
+				await AsyncStorage.setItem('access', jsonData?.access);
+				await AsyncStorage.setItem('refresh', jsonData?.refresh);
+				await AsyncStorage.setItem('userEmail', userEmail);
+				setLoading(false);
+				navigation.replace('DrawerNavigator');
+			};
+		} catch (error) {
+			console.error('Error logging in:', error);
+		} finally {
+			setLoading(false); // <--- Move this here
 		};
 	};
 
@@ -63,7 +69,7 @@ const LoginScreen = ({ navigation }) => {
 					alignContent: 'center',
 				}}>
 				<View>
-					<KeyboardAvoidingView enabled> 
+					<KeyboardAvoidingView enabled>
 						<View style={{ alignItems: 'center' }}>
 							<Image
 								source={require('../image/fonCirkcl.png')}
@@ -82,7 +88,7 @@ const LoginScreen = ({ navigation }) => {
 									setUserEmail(UserEmail)
 								}
 								value={userEmail}
-								placeholder="Enter Email"
+								placeholder="Enter Nickname"
 								placeholderTextColor="#ffffff"
 								autoCapitalize="none"
 								keyboardType="email-address"
