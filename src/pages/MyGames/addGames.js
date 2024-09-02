@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { CreateUserGame, GetAllGameDurations, GetAllGameLocations, getAllGameTypes, GetAllMoneyRanges, GetAllPlayerAges, GetAllPlayerCounts, UpdateUserGame } from '../../api/api';
 
 import Loader from '../../registration/components/loader';
@@ -7,6 +7,7 @@ import Loader from '../../registration/components/loader';
 
 
 const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, offline }) => {
+
 
 	const [name, setName] = useState('');
 	const [oldName, setOldName] = useState('');
@@ -18,15 +19,18 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 	const [age, setAge] = useState([]);
 	const [location, setLocation] = useState([]);
 	const [money, setMoney] = useState([]);
+	const [urlName, setUrlName] = useState();
+
 
 
 	const [selectedType, setSelectedType] = useState('');
 	const [selectedDuration, setSelectedDuration] = useState('');
 	const [selectedCountPlayers, setSelectedCountPlayers] = useState('');
 	const [selectedAge, setSelectedAge] = useState('');
-	const [selectedLocation, setSelectedLocation] = useState('');
+	const [selectedLocation, setSelectedLocation] = useState([]);
 	const [selectedMoney, setSelectedMoney] = useState('');
 	const [toggleSwitch, setToggleSwitch] = useState(false);
+
 
 	const [loading, setLoading] = useState(false);
 	const [animating, setAnimating] = useState(false);
@@ -58,7 +62,7 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 				setSelectedDuration(item.duration_sec);
 				setSelectedCountPlayers(item.count_players);
 				setSelectedAge(item.player_age);
-				setSelectedLocation(item.location);
+				setSelectedLocation(item.locations);
 				setSelectedMoney(item.money_range);
 				setToggleSwitch(item.is_private);
 			}
@@ -106,14 +110,19 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 				duration_sec: selectedDuration,
 				count_players: selectedCountPlayers,
 				player_age: selectedAge,
-				location: selectedLocation,
+				locations: selectedLocation,
 				money_range: selectedMoney,
 				is_private: toggleSwitch
 			});
 			const nameUrl = '/core/updateUserGame/';
 			const response = await UpdateUserGame(nameUrl, body, navigation);
 			if (response?.status !== 200 && response?.status !== 201) {
-				setAnimating(!animating);
+				setAnimating(false);
+				const status = await response.json();
+				if (status?.link_to_site == "Enter a valid URL.") {
+					Alert.alert("Помилка", "Введіть дійсну URL-адресу");
+					return;
+				};
 				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
 				return;
 			};
@@ -130,14 +139,20 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 				duration_sec: selectedDuration,
 				count_players: selectedCountPlayers,
 				player_age: selectedAge,
-				location: selectedLocation,
+				locations: selectedLocation,
 				money_range: selectedMoney,
+				link_to_site: urlName,
 				is_private: toggleSwitch
 			});
 			const nameUrl = '/core/createUserGame/';
 			const response = await CreateUserGame(nameUrl, body, navigation);
 			if (response?.status !== 200 && response?.status !== 201) {
-				setAnimating(!animating);
+				setAnimating(false);
+				const status = await response.json();
+				if (status?.link_to_site == "Enter a valid URL.") {
+					Alert.alert("Помилка", "Введіть дійсну URL-адресу");
+					return;
+				};
 				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
 				return;
 			};
@@ -158,14 +173,17 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 				<View style={styles.inputAddGameBlock}>
 					<TextInput
 						style={styles.input}
-						placeholder="Назва гри"
+						placeholder="Назва гри*"
 						keyboardType="default"
+						placeholderTextColor="black"
 						onChangeText={text => setName(text)}
+						maxLength={255}
 						value={name}
 					/>
 					<TextInput
 						style={styles.input}
-						placeholder="Реквізит"
+						placeholder="Реквізит*"
+						placeholderTextColor="black"
 						keyboardType="default"
 						onChangeText={text => setProps(text)}
 						value={props}
@@ -174,12 +192,14 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 						style={[styles.input, styles.inputArea]}
 						multiline={true}
 						numberOfLines={10}
-						placeholder="Основне завдання"
+						placeholder="Основне завдання*"
+						placeholderTextColor="black"
 						keyboardType="default"
 						onChangeText={text => setDescription(text)}
 						value={description}
+						textAlignVertical="top"
 					/>
-					<Text style={styles.valueText}>Категорія:</Text>
+					<Text style={styles.valueText}>Категорія: *</Text>
 					<View style={styles.block}>
 						{type.map((typeItem, index) => {
 							return (
@@ -191,7 +211,7 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 							);
 						})}
 					</View>
-					<Text style={styles.valueText}>Тривалість гри:</Text>
+					<Text style={styles.valueText}>Тривалість гри: *</Text>
 					<View style={styles.block}>
 						{duration.map((durationItem, index) => {
 							return (
@@ -203,7 +223,7 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 							);
 						})}
 					</View>
-					<Text style={styles.valueText}>Кількість учасників:</Text>
+					<Text style={styles.valueText}>Кількість учасників: *</Text>
 					<View style={styles.block}>
 						{countPlayers.map((countPlayersItem, index) => {
 							return (
@@ -215,7 +235,7 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 							);
 						})}
 					</View>
-					<Text style={styles.valueText}>Вік (років):</Text>
+					<Text style={styles.valueText}>Вік (років): *</Text>
 					<View style={styles.block}>
 						{age.map((ageItem, index) => {
 							return (
@@ -227,11 +247,24 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 							);
 						})}
 					</View>
-					<Text style={styles.valueText}>Локація:</Text>
+					<Text style={styles.valueText}>Локація: * <Text style={styles.valueTextSmall}> (можна обрати декілька варіантів)</Text></Text>
 					<View style={styles.block}>
 						{location.map((locationItem, index) => {
+							const isSelected = selectedLocation.includes(locationItem);
 							return (
-								<Pressable key={index} style={{ backgroundColor: selectedLocation === locationItem ? '#B66A53' : '#FAE2D4' }} onPress={() => { setSelectedLocation(locationItem) }}>
+								<Pressable
+									key={index}
+									style={{
+										backgroundColor: isSelected ? '#B66A53' : '#FAE2D4',
+									}}
+									onPress={() => {
+										if (isSelected) {
+											setSelectedLocation(selectedLocation.filter((loc) => loc !== locationItem));
+										} else {
+											setSelectedLocation([...selectedLocation, locationItem]);
+										}
+									}}
+								>
 									<View>
 										<Text style={styles.blockText}>{locationItem}</Text>
 									</View>
@@ -239,7 +272,7 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 							);
 						})}
 					</View>
-					<Text style={styles.valueText}>Фінанси (грн):</Text>
+					<Text style={styles.valueText}>Фінанси (грн): *</Text>
 					<View style={styles.block}>
 						{money.map((moneyItem, index) => {
 							return (
@@ -251,8 +284,20 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 							);
 						})}
 					</View>
+					<View>
+						<Text style={styles.valueText}>Посилання на гру: </Text>
+						<TextInput
+							style={styles.input}
+							placeholder="url адреса"
+							keyboardType="default"
+							placeholderTextColor="black"
+							onChangeText={text => setUrlName(text)}
+							maxLength={255}
+							value={urlName}
+						/>
+					</View>
 					<View style={styles.containerSwitch}>
-						<Text style={styles.blockText}>Приватна гра: </Text>
+						<Text style={styles.containerSwitchText}>Приватна гра: * </Text>
 						<Switch
 							trackColor={{ false: '#FAE2D4', true: '#B66A53' }}
 							style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }], marginTop: 10, }}
@@ -274,15 +319,14 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 					</View>
 				</View>
 			</ScrollView>}
-			<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 40, fontWeight: 'bold' }}>Thank You</Text>
-
+			{/* <Text style={{ fontSize: 30, textAlign: "center", marginBottom: 30, fontWeight: 'bold' }}></Text> */}
 		</SafeAreaView>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
-		height: '100%',
+		height: '90%',
 	},
 	inputAddGameBlock: {
 		marginLeft: 12,
@@ -327,10 +371,18 @@ const styles = StyleSheet.create({
 	blockText: {
 		textAlign: 'center',
 		margin: 8,
+		color: '#0000009a',
 	},
 	valueText: {
 		fontWeight: 'bold',
 		fontSize: 20,
+		paddingTop: 10,
+		color: '#000000ab',
+	},
+	valueTextSmall: {
+		fontSize: 14,
+		fontWeight: '400',
+		color: '#000000ab',
 		paddingTop: 10,
 	},
 	containerSwitch: {
@@ -340,8 +392,10 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	containerSwitchText: {
+		fontWeight: 'bold',
 		fontSize: 20,
-		color: 'black',
+		paddingTop: 10,
+		color: '#000000ab',
 	},
 	activityIndicator: {
 		height: 80,

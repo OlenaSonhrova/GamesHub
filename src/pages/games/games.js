@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View, Image, RefreshControl } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery } from '@tanstack/react-query';
-import Loader from '../../registration/components/loader';
-import { getAllGameTypes } from '../../api/api';
-import LocalStorage from '../../Localstorege/LocalStorege';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import Loader from '../../registration/components/loader';
+import LocalStorage from '../../Localstorege/LocalStorege';
+
+import { getAllGameTypes } from '../../api/api';
+
 
 
 const Games = ({ offline, statusServer }) => {
@@ -28,7 +31,7 @@ const Games = ({ offline, statusServer }) => {
 		{
 			queryKey: ["getAllGameTypes"],
 			queryFn: () => getAllGameTypes('/core/getAllGameTypes/', navigation),
-			retry: 2,
+			retry: 1,
 		},
 	);
 

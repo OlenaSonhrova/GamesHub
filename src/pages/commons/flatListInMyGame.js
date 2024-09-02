@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 		display: 'flex',
 		flexDirection: 'row',
-		// gap: 10,
 		alignItems: 'center',
 		padding: 5,
 		borderRadius: 7,
@@ -131,6 +130,9 @@ const styles = StyleSheet.create({
 	text: {
 		color: 'black',
 		fontSize: 24,
+	},
+	number: {
+		color: 'black',
 	},
 	average_rating: {
 		display: 'flex',

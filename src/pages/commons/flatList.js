@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faStar, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faHeart, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
 
 
 import ModalComponent from './modal';
-import { RemoveSelectedGame, SelectedGame } from '../../api/api';
+import { PlayedGame, RemoveSelectedGame, RemoveUserPlayedGame, SelectedGame } from '../../api/api';
 
-const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, imageLocal, offline }) => {
+const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, imageLocal, offline, listGamesPlayed, listGamesLiked}) => {
+
 
 	const [gamePressed, setGamePressed] = useState(null);
 	const [newData, setNewData] = useState(data);
@@ -52,12 +53,59 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 		};
 	};
 
+	const setPlayedGame = async (idGame, played) => {
+		if (offline) {
+			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
+			return;
+		};
+		if (played) {
+			const response = await RemoveUserPlayedGame(idGame, navigation);
+			if (response?.status !== 200) {
+				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+				return response?.status;
+			} else {
+				const updatedGames = newData.map((game) =>
+					game.name === idGame ? { ...game, is_played: false } : game
+				);
+				setNewData(updatedGames);
+				return response?.status;
+			};
+		} else {
+			const response = await PlayedGame(idGame, navigation);
+			if (response?.status !== 200) {
+				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+				return response?.status;
+			} else {
+				const updatedGames = newData.map((game) =>
+					game.name === idGame ? { ...game, is_played: true } : game
+				);
+				setNewData(updatedGames);
+				return response?.status;
+			};
+		};
+	};
+
 	const setRemoveGame = async (idGame) => {
 		if (offline) {
 			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
 			return;
 		};
 		const response = await RemoveSelectedGame(idGame, navigation);
+		if (response?.status !== 200) {
+			Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+			return;
+		} else {
+			const updatedGames = newData.filter((game) => game.name !== idGame);
+			setNewData(updatedGames);
+		};
+	};
+
+	const setRemoveCheckGame = async (idGame) => {
+		if (offline) {
+			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
+			return;
+		};
+		const response = await RemoveUserPlayedGame(idGame, navigation);
 		if (response?.status !== 200) {
 			Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
 			return;
@@ -107,15 +155,24 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 									<Text style={styles.rating}>{item.average_rating}</Text>
 								</View>
 							</View>
-							<View>
+							<View style={styles.blockHeartCheck}>
 								<Pressable style={styles.blockHeart} onPress={() => {
-									if (item.is_selected === undefined) {
+									if (listGamesLiked) {
 										setRemoveGame(item.name, item.is_selected);
 									} else {
 										setSelectedGame(item.name, item.is_selected)
 									}
 								}}>
-									<FontAwesomeIcon icon={faHeart} size={30} color={item.is_selected === undefined ? 'red' : item.is_selected ? 'red' : 'black'} />
+									<FontAwesomeIcon icon={faHeart} size={30} color={item.is_selected === undefined ? 'red' : item.is_selected ? 'red' : '#8f7878'} />
+								</Pressable>
+								<Pressable style={styles.blockCheck} onPress={() => {
+									if (listGamesPlayed) {
+										setRemoveCheckGame(item.name, item.is_played);
+									} else {
+										setPlayedGame(item.name, item.is_played)
+									}
+								}}>
+									<FontAwesomeIcon icon={faSquareCheck} size={30} color={item.is_played === undefined ? 'black' : item.is_played ? 'black' : '#8f7878'} />
 								</Pressable>
 							</View>
 						</Pressable>
@@ -126,8 +183,7 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 				)}
 			/>
 			{
-				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={(hasInteracted) => { setGamePressed(null); if (hasInteracted) {onRefresh();}}} setSelectedGame={setSelectedGame} offline={offline}/>
-					// gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={() => { setGamePressed(null); onRefresh(); }} setSelectedGame={setSelectedGame} />
+				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={(hasInteracted) => { setGamePressed(null); if (hasInteracted) { onRefresh(); } }} setSelectedGame={setSelectedGame} offline={offline} />
 				)}
 		</View>
 	);
@@ -147,11 +203,14 @@ const styles = StyleSheet.create({
 		borderRadius: 7,
 	},
 	blockText: {
-		flexBasis: '63%',
+		flexBasis: '50%',
 	},
 	text: {
 		color: 'black',
 		fontSize: 20,
+	},
+	number: {
+		color: 'black',
 	},
 	blockIcon: {
 		backgroundColor: 'green',
@@ -172,9 +231,23 @@ const styles = StyleSheet.create({
 		margin: 4,
 		marginRight: 10,
 	},
+	blockHeartCheck: {
+		display: 'flex',
+		flexDirection: 'row',
+
+
+	},
 	blockHeart: {
-		paddingHorizontal: 26,
+		paddingHorizontal: 15,
 		paddingVertical: 22,
+		// borderColor: 'black',
+		// borderWidth: 1,
+	},
+	blockCheck: {
+		paddingHorizontal: 15,
+		paddingVertical: 22,
+		// borderColor: 'black',
+		// borderWidth: 1,
 	},
 });
 

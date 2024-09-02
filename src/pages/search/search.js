@@ -7,7 +7,6 @@ import SelectDropdown from 'react-native-select-dropdown';
 
 import FlatListComponent from '../commons/flatList';
 import { GetAllGameDurations, GetAllGameLocations, GetAllMoneyRanges, GetAllPlayerAges, GetAllPlayerCounts, SearchGames, getAllGameTypes } from '../../api/api';
-import Loader from '../../registration/components/loader';
 
 const Search = ({ navigation, offline, statusServer }) => {
 
@@ -21,7 +20,7 @@ const Search = ({ navigation, offline, statusServer }) => {
 	const [duration, setDuration] = useState();
 	const [countPlayers, setCountPlayers] = useState();
 	const [age, setAge] = useState();
-	const [location, setLocation] = useState();
+	const [location, setLocation] = useState([]);
 	const [money, setMoney] = useState();
 	const rating = ["більше >= 0", "більше >= 1", "більше >= 2", "більше >= 3", "більше >= 4", "більше >= 5"];
 
@@ -66,10 +65,6 @@ const Search = ({ navigation, offline, statusServer }) => {
 		};
 	};
 
-	// useEffect(() => {
-	// 	getDataInfa();
-	// }, [offline]);
-
 	useEffect(() => {
 		if (offline) {
 		} else {
@@ -97,7 +92,7 @@ const Search = ({ navigation, offline, statusServer }) => {
 				duration_sec: selectDuration,
 				count_players: selectCountPlayers,
 				player_age: selectAge,
-				location: selectLocation,
+				locations: selectLocation,
 				money_range: selectMoney,
 				average_rating: selectRating,
 				author: author,
@@ -133,7 +128,8 @@ const Search = ({ navigation, offline, statusServer }) => {
 						<View style={styles.blockOne} >
 							<TextInput
 								style={[styles.inputName, styles.input]}
-								placeholder="Назва гри"
+								placeholder="  Назва гри"
+								placeholderTextColor="black"
 								keyboardType="default"
 								onChangeText={text => text === "" ? setName(null) : setName(text)}
 								value={name}
@@ -144,18 +140,20 @@ const Search = ({ navigation, offline, statusServer }) => {
 							</Pressable>
 						</View>
 
-						<View style={{ display: moreOption ? 'none' : '' }}>
+						<View style={[styles.blockMoreOption, { display: moreOption ? 'none' : '' }]}>
 							<View style={styles.blockTwo}>
 								<TextInput
 									style={[styles.inputName, styles.input]}
-									placeholder="Реквізит"
+									placeholder="  Реквізит"
+									placeholderTextColor="black"
 									keyboardType="default"
 									onChangeText={text => text === "" ? setProps(null) : setProps(text)}
 									value={props}
 								/>
 								<TextInput
 									style={[styles.inputName, styles.input]}
-									placeholder="Автор гри"
+									placeholder="  Автор гри"
+									placeholderTextColor="black"
 									keyboardType="default"
 									onChangeText={text => text === "" ? setAuthor(null) : setAuthor(text)}
 									value={author}
@@ -163,7 +161,8 @@ const Search = ({ navigation, offline, statusServer }) => {
 							</View>
 							<TextInput
 								style={[styles.input, styles.inputLast]}
-								placeholder="Основне завдання"
+								placeholder="  Основне завдання"
+								placeholderTextColor="black"
 								keyboardType="default"
 								onChangeText={text => text === "" ? setDescription(null) : setDescription(text)}
 								value={description}
@@ -258,6 +257,7 @@ const Search = ({ navigation, offline, statusServer }) => {
 									}}
 									defaultValue={selectLocation}
 								/>
+
 								<SelectDropdown
 									data={money}
 									key={selectMoney || "defaultKey5"}
@@ -312,7 +312,6 @@ const Search = ({ navigation, offline, statusServer }) => {
 											setSelectCountPlayers(selectedItem);
 										};
 									}}
-									// defaultButtonText={selectCountPlayers ?? 'Кількість учасників'}
 									defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectCountPlayers ?? 'Кількість учасників'}</Text>}
 									buttonStyle={{
 										backgroundColor: selectCountPlayers ? '#bebebe' : '#FAE2D4',
@@ -419,10 +418,9 @@ const styles = StyleSheet.create({
 		marginTop: 1,
 		marginBottom: 3,
 		borderWidth: 1,
-		padding: 10,
 	},
 	inputName: {
-		width: '48%'
+		width: '48%',
 	},
 	inputLast: {
 		marginBottom: 10,

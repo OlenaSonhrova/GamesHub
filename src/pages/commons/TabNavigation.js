@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faFolder, faSearch, faCirclePlus, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faFolder, faSearch, faCirclePlus, faHeart, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 
-import { SearchStackNavigator, GamesStackNavigator, Liked, MyGames } from "./stackNavigation";
+import { SearchStackNavigator, GamesStackNavigator, Liked, MyGames, Played } from "./stackNavigation";
 import OnlineOffline from "../../menu/OnlineOffline";
-import { Pressable } from "react-native";
-import { ChangeInternet } from "../../api/api";
 
 
 
 const Tab = createBottomTabNavigator();
 
-const BottomTabNavigator = ({ navigation, statusServer, offline, isLoading, changeInternet }) => {
+const BottomTabNavigator = ({ statusServer, offline, isLoading, changeInternet }) => {
 
 	const [isOffline, setIsOffline] = useState(offline);
 
@@ -26,13 +24,6 @@ const BottomTabNavigator = ({ navigation, statusServer, offline, isLoading, chan
 			screenOptions={{
 				tabBarActiveTintColor: '#B66A53',
 				headerShown: isOffline,
-				// header: () => {
-				// 	if (offline) {
-				// 		return <OnlineOffline changeInternet={changeInternet} />;
-				// 	} else {
-				// 		return null;
-				// 	}
-				// },
 			}}>
 			<Tab.Screen name="GamesTab" options={{
 				tabBarLabel: 'Games',
@@ -40,7 +31,7 @@ const BottomTabNavigator = ({ navigation, statusServer, offline, isLoading, chan
 					<FontAwesomeIcon icon={faFolder} color={color} />
 				),
 				header: () => (
-					<OnlineOffline changeInternet={changeInternet} isLoading={isLoading}/>
+					<OnlineOffline changeInternet={changeInternet} isLoading={isLoading} />
 				),
 			}} >
 				{() => <GamesStackNavigator offline={offline} statusServer={statusServer} />}
@@ -56,15 +47,6 @@ const BottomTabNavigator = ({ navigation, statusServer, offline, isLoading, chan
 			}}>
 				{() => <SearchStackNavigator offline={offline} statusServer={statusServer} />}
 			</Tab.Screen>
-			{/* <Tab.Screen name="SearchTab" options={{
-				tabBarLabel: 'Search',
-				tabBarIcon: ({ color }) => (
-					<FontAwesomeIcon icon={faSearch} color={color} />
-				),
-				header: () => (
-					<OnlineOffline />
-				),
-			}} component={SearchStackNavigator} /> */}
 			<Tab.Screen name="LikedTab" options={{
 				tabBarLabel: 'Liked',
 				tabBarIcon: ({ color }) => (
@@ -76,13 +58,26 @@ const BottomTabNavigator = ({ navigation, statusServer, offline, isLoading, chan
 			}}>
 				{() => <Liked offline={offline} statusServer={statusServer} />}
 			</Tab.Screen>
+
+			<Tab.Screen name="PlayedTab" options={{
+				tabBarLabel: 'Played',
+				tabBarIcon: ({ color }) => (
+					<FontAwesomeIcon icon={faSquareCheck} color={color} />
+				),
+				header: () => (
+					<OnlineOffline changeInternet={changeInternet} isLoading={isLoading} />
+				),
+			}}>
+				{() => <Played offline={offline} statusServer={statusServer} />}
+			</Tab.Screen>
+
 			<Tab.Screen name="MyGamesTab" options={{
 				tabBarLabel: 'My Games',
 				tabBarIcon: ({ color }) => (
 					<FontAwesomeIcon icon={faCirclePlus} color={color} />
 				),
 				header: () => (
-					<OnlineOffline changeInternet={changeInternet}  />
+					<OnlineOffline changeInternet={changeInternet} />
 				),
 			}} >
 				{() => <MyGames offline={offline} statusServer={statusServer} />}

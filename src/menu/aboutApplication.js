@@ -85,12 +85,11 @@ const styles = StyleSheet.create({
 		gap: 10,
 		alignItems: 'center',
 	},
-	itemImage: {
-	},
 	titemText: {
 		fontSize: 16,
 		flex: 1,
 		textAlign: 'justify',
+		color: '#363535cb',
 	},
 	itemTextTitle: {
 		fontWeight: '900',

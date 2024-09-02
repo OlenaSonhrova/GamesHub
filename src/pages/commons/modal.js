@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile } from '@fortawesome/free-solid-svg-icons';
 
@@ -15,6 +15,8 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame, offline }) => {
 	if (!gamePressed) {
 		return null;
 	};
+
+	// console.log('gamePdffgbressed', gamePressed);
 
 	const [selectedHard, setSelectedHard] = useState(gamePressed.is_selected);
 	const [hasInteracted, setHasInteracted] = useState(false);
@@ -99,7 +101,9 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame, offline }) => {
 							</View>
 							<View style={styles.bodyIconItem}>
 								<FontAwesomeIcon icon={faLocationDot} size={30} color='black' />
-								<Text style={styles.bodyIconTextt}>{gamePressed.location}</Text>
+								{gamePressed.locations.map((location, index) => (
+									<Text key={index} style={styles.bodyIconTextt}>{location}</Text>
+								))}
 							</View>
 						</View>
 						<ScrollView style={styles.bodyInfa}>
@@ -111,6 +115,14 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame, offline }) => {
 								<Text style={styles.bodyInfaTitle}>Реквізит</Text>
 								<Text style={styles.bodyInfaText}>{gamePressed.props}</Text>
 							</View>
+							{gamePressed.link_to_site && (
+								<View style={styles.bodyInfaItem}>
+									<Text style={styles.bodyInfaTitle}>Посилання на гру</Text>
+									<TouchableOpacity onPress={() => Linking.openURL(gamePressed.link_to_site)}>
+										<Text style={styles.bodyInfaText}>{gamePressed.link_to_site}</Text>
+									</TouchableOpacity>
+								</View>
+							)}
 						</ScrollView>
 						<Text style={styles.paddingBottom}>Автор: {gamePressed.author}</Text>
 					</View>
@@ -127,6 +139,16 @@ const styles = StyleSheet.create({
 		padding: 7,
 		backgroundColor: '#EEC9B0',
 		height: '100%',
+	},
+	head: {
+	},
+	body: {
+		flex: 1,
+		marginTop: 10,
+		padding: 5,
+		backgroundColor: '#FFFAF5',
+		borderTopEndRadius: 20,
+		borderTopLeftRadius: 20,
 	},
 	arrowLeft: {
 		padding: 10,
@@ -149,19 +171,18 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		maxWidth: '75%'
 	},
-	body: {
-		marginTop: 10,
-		padding: 5,
-		backgroundColor: '#FFFAF5',
-		borderTopEndRadius: 20,
-		borderTopLeftRadius: 20,
-	},
 	bodyIcon: {
 		display: 'flex',
 		flexDirection: 'row',
+		alignItems: 'baseline',
 		justifyContent: 'space-around',
-		alignItems: 'center',
-		paddingBottom: 30,
+		paddingBottom: 10,
+		paddingTop: 10,
+		width: '100%',
+		minHeight: 125,
+		textOverflow: 'ellipsis',
+		whiteSpace: 'nowrap',
+		overflow: 'hidden',
 	},
 	bodyIconItem: {
 		display: 'flex',
@@ -174,9 +195,6 @@ const styles = StyleSheet.create({
 		color: 'black',
 	},
 	bodyInfa: {
-		display: 'flex',
-		gap: 30,
-		height: '62%',
 	},
 	bodyInfaTitle: {
 		fontSize: 34,

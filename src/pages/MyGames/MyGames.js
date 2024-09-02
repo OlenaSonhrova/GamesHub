@@ -35,7 +35,7 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 		{
 			queryKey: ["GetUserCreatedGames"],
 			queryFn: () => GetUserCreatedGames('/core/getUserCreatedGames/', navigation),
-			retry: 2,
+			retry: 1,
 		},
 	);
 
@@ -121,7 +121,7 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 		return (
 			<SafeAreaView style={[styles.backgroundColor, styles.center]}>
 				<Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10 }}>Мої ігри</Text>
-				<FlatListInMyGame data={localData} onRefresh={handleRefresh} imageLocal={imageLocal} offline={offline}/>
+				<FlatListInMyGame data={localData} onRefresh={handleRefresh} imageLocal={imageLocal} offline={offline} />
 			</SafeAreaView>
 		);
 	};
@@ -135,8 +135,7 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 			</Pressable>
 			{addGameVisible ? <AddGame returnedDataAdd={returnedDataAdd} returnedDataUp={returnedDataUp} item={newItem} upDate={upDate} offline={offline} /> : null}
 			<View style={styles.center}>
-				{(isLoading) ? <Loader /> : <FlatListInMyGame data={newData} refreshing={isRefetching} onRefresh={handleRefresh} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} offline={offline}/>}
-				{/* {(isLoading || isRefetching) ? <Loader /> : <FlatListInMyGame data={newData} refreshing={isLoading} onRefresh={handleRefresh} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} />} */}
+				{(isLoading) ? <Loader /> : <FlatListInMyGame data={newData} refreshing={isRefetching} onRefresh={handleRefresh} imageLocal={imageLocal} returnedClickUpDate={returnedClickUpDate} offline={offline} />}
 			</View>
 		</SafeAreaView>
 	);
@@ -147,7 +146,6 @@ const styles = StyleSheet.create({
 		margin: 10,
 	},
 	backgroundColor: {
-		// backgroundColor: '#FFFAF5',
 		height: '100%',
 	},
 	addGameBlock: {
@@ -155,6 +153,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: 10,
 		paddingBottom: 10,
+	},
+	addGameText: {
+		color: 'black',
 	},
 });
 

@@ -3,9 +3,6 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
-import { persistQueryClient } from '@tanstack/react-query-persist-client';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import DrawerNavigator from './src/menu/drawerNavigator';
 import LoginScreen from './src/registration/LoginScreen';

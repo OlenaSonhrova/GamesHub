@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, SafeAreaView, StyleSheet } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
 import { DrawerContentScrollView, DrawerItemList, createDrawerNavigator } from "@react-navigation/drawer";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleQuestion, faArrowLeft, faHandshakeSimple, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
@@ -28,14 +28,12 @@ const DrawerNavigator = ({ navigation }) => {
 		{
 			queryKey: ["changeInternet"],
 			queryFn: () => ChangeInternet(navigation),
-			retry: 2,
+			retry: 1,
 		},
 	);
 
 	useEffect(() => {
 		statusServer(!!isError);
-		// console.log('isError', !!isError);
-		// Alert.alert('Infa', 'status offline', offline);
 	}, [isError]);
 
 	const changeInternet = async () => {

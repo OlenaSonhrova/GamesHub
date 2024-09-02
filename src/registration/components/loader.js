@@ -4,18 +4,12 @@ import { StyleSheet, View, Modal, ActivityIndicator } from 'react-native';
 const Loader = (props) => {
 	const loading = props.loading;
 
-	// const [changeLoad, setChangeLoad] = useState(loading);
-
-	// const closeModal = () => {
-	// 	setChangeLoad(false);
-	// };
 
 	return (
 		<Modal
 			transparent={true}
 			animationType={'none'}
 			visible={loading}
-			// onRequestClose={closeModal}
 			onRequestClose={() => {
 				console.log('close modal');
 			}}

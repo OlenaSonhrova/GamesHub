@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View, Linking, TouchableOpacity } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHeart, faPenToSquare, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -9,6 +9,10 @@ import { faHeart, faPenToSquare, faArrowLeft, faLocationDot, faUsers, faStopwatc
 const ModalMyGame = ({ gamePressed, onClose, imageLocal, returnedClickUpDate, offline }) => {
 
 	const [modalVisible, setModalVisible] = useState(true);
+
+
+
+	// console.log('gamePdffgbressed', gamePressed);
 
 
 	if (!gamePressed) {
@@ -21,7 +25,7 @@ const ModalMyGame = ({ gamePressed, onClose, imageLocal, returnedClickUpDate, of
 	};
 
 	const upDateUserGame = (item) => {
-		if(offline) {
+		if (offline) {
 			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
 			return;
 		};
@@ -76,7 +80,9 @@ const ModalMyGame = ({ gamePressed, onClose, imageLocal, returnedClickUpDate, of
 							</View>
 							<View style={styles.bodyIconItem}>
 								<FontAwesomeIcon icon={faLocationDot} size={30} color='black' />
-								<Text style={styles.bodyIconTextt}>{gamePressed.location}</Text>
+								{gamePressed.locations.map((location, index) => (
+									<Text key={index} style={styles.bodyIconTextt}>{location}</Text>
+								))}
 							</View>
 						</View>
 						<ScrollView style={styles.bodyInfa}>
@@ -88,6 +94,14 @@ const ModalMyGame = ({ gamePressed, onClose, imageLocal, returnedClickUpDate, of
 								<Text style={styles.bodyInfaTitle}>Реквізит</Text>
 								<Text style={styles.bodyInfaText}>{gamePressed.props}</Text>
 							</View>
+							{gamePressed.link_to_site && (
+								<View style={styles.bodyInfaItem}>
+									<Text style={styles.bodyInfaTitle}>Посилання на гру</Text>
+									<TouchableOpacity onPress={() => Linking.openURL(gamePressed.link_to_site)}>
+										<Text style={styles.bodyInfaText}>{gamePressed.link_to_site}</Text>
+									</TouchableOpacity>
+								</View>
+							)}
 						</ScrollView>
 						<Text style={styles.paddingBottom}>Автор: {gamePressed.author}</Text>
 					</View>
@@ -105,37 +119,57 @@ const styles = StyleSheet.create({
 		backgroundColor: '#EEC9B0',
 		height: '100%',
 	},
-	arrowLeft: {
-		padding: 10,
+	head: {
 	},
-	headFlex: {
+	headIcon: {
 		display: 'flex',
 		flexDirection: 'row',
-		justifyContent: 'center',
 		alignItems: 'center',
-		paddingBottom: 30,
-		gap: 30,
-
-	},
-	headText: {
-		fontSize: 38,
-		color: 'black',
-		fontWeight: '700',
+		justifyContent: 'space-between',
 	},
 	body: {
+		flex: 1,
 		marginTop: 10,
 		padding: 5,
 		backgroundColor: '#FFFAF5',
 		borderTopEndRadius: 20,
 		borderTopLeftRadius: 20,
-		height: '80%',
+	},
+	arrowLeft: {
+		padding: 10,
+		paddingBottom: 0,
+	},
+	headFlex: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingBottom: 30,
+		gap: 30,
+	},
+	faHeart: {
+		padding: 30,
+		paddingLeft: 45,
+		paddingRight: 10,
+	},
+	headText: {
+		fontSize: 34,
+		color: 'black',
+		fontWeight: '700',
+		maxWidth: '75%'
 	},
 	bodyIcon: {
 		display: 'flex',
 		flexDirection: 'row',
+		alignItems: 'baseline',
 		justifyContent: 'space-around',
-		alignItems: 'center',
-		paddingBottom: 30,
+		paddingBottom: 10,
+		paddingTop: 10,
+		width: '100%',
+		minHeight: 125,
+		textOverflow: 'ellipsis',
+		whiteSpace: 'nowrap',
+		overflow: 'hidden',
 	},
 	bodyIconItem: {
 		display: 'flex',
@@ -148,9 +182,6 @@ const styles = StyleSheet.create({
 		color: 'black',
 	},
 	bodyInfa: {
-		display: 'flex',
-		gap: 30,
-		height: '62%',
 	},
 	bodyInfaTitle: {
 		fontSize: 34,
@@ -162,12 +193,6 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		color: 'black',
 		fontWeight: '400',
-	},
-	headIcon: {
-		display: 'flex',
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
 	},
 });
 

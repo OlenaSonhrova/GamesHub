@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery } from '@tanstack/react-query';
 
@@ -13,7 +13,7 @@ const UserProfileHeader = ({ navigation }) => {
 		{
 			queryKey: ["getUserInfo"],
 			queryFn: () => GetUserInfo(navigation),
-			retry: 2,
+			retry: 1,
 		},
 	);
 
@@ -33,8 +33,8 @@ const UserProfileHeader = ({ navigation }) => {
 					<Image source={require('../image/online.png')}></Image>
 				</View>
 				<View style={styles.infa}>
-					<Text style={styles.text} numberOfLines={1} ellipsizeMode="tail"> <Text style={{ fontSize: 18, fontWeight: '900' }}>User:</Text> {localData?.user?.username}</Text>
-					<Text style={styles.text} numberOfLines={1} ellipsizeMode="tail"> <Text style={{ fontSize: 18, fontWeight: '900' }}>Email:</Text> {localData?.user?.email}</Text>
+					<Text style={styles.text} numberOfLines={1} ellipsizeMode="tail"> <Text style={{ fontSize: 18, fontWeight: '900'}}>User:</Text> {localData?.user?.username}</Text>
+					<Text style={styles.text} numberOfLines={1} ellipsizeMode="tail"> <Text style={{ fontSize: 18, fontWeight: '900'}}>Email:</Text> {localData?.user?.email}</Text>
 				</View>
 			</View>
 		);
@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		fontSize: 16,
+		color: '#363535cb',
 	},
 });
 

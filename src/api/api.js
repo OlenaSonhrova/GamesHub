@@ -3,7 +3,6 @@ import { SERVER_URL } from '../consts/consts';
 
 
 const basePost = async (url, body, navigation) => {
-	// console.log(url);
 	const access = await AsyncStorage.getItem('access');
 	// console.log(access);
 	try {
@@ -34,9 +33,7 @@ const basePost = async (url, body, navigation) => {
 
 const baseGet = async (nameUrl, navigation) => {
 	const access = await AsyncStorage.getItem('access');
-	// console.log(access);
 	const url = SERVER_URL + nameUrl;
-	// console.log(url);
 	try {
 		const response = await fetch(url, {
 			method: 'GET',
@@ -170,7 +167,6 @@ const Register = async (userName, userEmail, userPassword) => {
 const getAllGameTypes = async (nameUrl, navigation) => {
 	try {
 		const response = await baseGet(nameUrl, navigation);
-		// console.log('response', response);
 		await AsyncStorage.setItem('AllTypes', JSON.stringify(response));
 		return response;
 	} catch (error) {
@@ -179,8 +175,8 @@ const getAllGameTypes = async (nameUrl, navigation) => {
 	};
 };
 
-const GetAllGames = async (navigation) => {
-	const nameUrl = '/core/getAllGames/?';
+const GetAllGames = async (type, navigation) => {
+	const nameUrl = '/core/getAllGames/?'+ new URLSearchParams({ game_type: type, from_timestamp_ms: null });
 	try {
 		const response = await baseGet(nameUrl, navigation);
 		return response;
@@ -203,6 +199,19 @@ const SelectedGame = async (idGame, navigation) => {
 	};
 };
 
+const PlayedGame = async (idGame, navigation) => {
+	const url = SERVER_URL + '/core/setUserPlayedGame/';
+	const body = JSON.stringify({
+		name: idGame
+	});
+	try {
+		const response = await basePost(url, body, navigation);
+		return response;
+	} catch (error) {
+		throw error;
+	};
+};
+
 const RemoveSelectedGame = async (idGame, navigation) => {
 	const url = SERVER_URL + '/core/removeSelectedGame/';
 	const body = JSON.stringify({
@@ -213,6 +222,20 @@ const RemoveSelectedGame = async (idGame, navigation) => {
 		return response;
 	} catch (error) {
 		console.log('Opssss.RemoveSelectedGame');
+		throw error;
+	};
+};
+
+const RemoveUserPlayedGame = async (idGame, navigation) => {
+	const url = SERVER_URL + '/core/removeUserPlayedGame/';
+	const body = JSON.stringify({
+		name: idGame,
+	});
+	try {
+		const response = await basePost(url, body, navigation);
+		return response;
+	} catch (error) {
+		console.log('Opssss.RemoveUserPlayedGame');
 		throw error;
 	};
 };
@@ -304,6 +327,16 @@ const GetUserSelectedGames = async (nameUrl, navigation) => {
 	};
 };
 
+const GetUserPlayedGames = async (nameUrl, navigation) => {
+	try {
+		const response = await baseGet(nameUrl, navigation);
+		return response?.games;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	};
+};
+
 const GetUserCreatedGames = async (nameUrl, navigation) => {
 	try {
 		const response = await baseGet(nameUrl, navigation);
@@ -365,12 +398,6 @@ const ChangeInternet = async () => {
 		});
 		console.log('finish in ChangeInternet', nameUrl, response?.status);
 		return response?.status ;
-		// throw new Error('Simulated error');
-		// if (Math.random() < 0.5) {
-		// 	throw new Error('Simulated error');
-		// } else {
-		// 	return response?.status;
-		// }
 	} catch (error) {
 		console.error('Error baseGet data:', error);
 		throw error;
@@ -400,5 +427,8 @@ export {
 	UpdateUserGame,
 	CreateUserGame,
 	SearchGames,
-	ChangeInternet
+	ChangeInternet,
+	GetUserPlayedGames,
+	RemoveUserPlayedGame,
+	PlayedGame
 };

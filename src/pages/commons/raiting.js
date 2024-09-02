@@ -1,10 +1,18 @@
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
-import { Rating } from 'react-native-ratings';
+import { useState } from 'react';
+import Rating from 'react-native-easy-rating';
 
 import { SetGameRating } from '../../api/api';
 
+
+
+
 const RatingGame = ({ idGame, userRating, checkChangeUserRating, navigation, offline }) => {
 
+	const [ratingNow, setRatingNow] = useState(userRating);
+
+	const starBraun = require('../../image/starBraun.png');
+	const starYelow = require('../../image/starYelow.png');
 
 	const ratingCompleted = async (rating) => {
 		if (offline) {
@@ -12,12 +20,24 @@ const RatingGame = ({ idGame, userRating, checkChangeUserRating, navigation, off
 			return;
 		};
 		checkChangeUserRating(rating);
-		const respons = await SetGameRating(idGame, rating, navigation);
-		if (respons?.status !== 200) {
-			Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
-			return;
+
+		if (rating === ratingNow) {
+			setRatingNow(0);
+			const respons = await SetGameRating(idGame, 0, navigation);
+			if (respons?.status !== 200) {
+				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+				return;
+			};
+		} else {
+			setRatingNow(rating);
+			const respons = await SetGameRating(idGame, rating, navigation);
+			if (respons?.status !== 200) {
+				Alert.alert("Помилка", "Сервер не відповідає! спробуйте ще раз");
+				return;
+			};
 		};
 	};
+
 
 	const handleStartRating = () => {
 		if (offline) {
@@ -29,16 +49,14 @@ const RatingGame = ({ idGame, userRating, checkChangeUserRating, navigation, off
 		<View style={styles.headRaiting}>
 			<Pressable onPress={handleStartRating}>
 				<Rating
-					type='star'
-					ratingCount={5}
-					imageSize={35.0}
-					tintColor='#EEC9B0'
-					startingValue={userRating}
-					onFinishRating={ratingCompleted}
-					readonly={offline}
-				/>
+					rating={ratingNow}
+					max={5}
+					iconWidth={40}
+					iconHeight={40}
+					iconSelected={starYelow}
+					iconUnselected={starBraun}
+					onRate={ratingCompleted} />
 			</Pressable>
-
 		</View>
 	);
 };

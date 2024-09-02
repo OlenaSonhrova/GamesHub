@@ -1,4 +1,4 @@
-import { BackHandler, Button, Image, Linking, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, Image, Linking, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
 import { useEffect } from 'react';
@@ -10,15 +10,15 @@ const Help = ({ navigation }) => {
 		if (index === 1) {
 			Linking.openURL('https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&to=esongrovaa@gmail.com&subject=MISSED%20CALL%20EZTRADER&body=Hello%2C%20I%20am%20writing%20about%20the%20application%20Games%20Hub...%0A%0A%0A%0A');
 		} else if (index == 2) {
-			Linking.openURL('http://t.me/Olena_Song');
+			Linking.openURL('http://t.me/Olena_Deoba');
 		} else {
-			Linking.openURL('https://www.instagram.com/olena_sonhrova?igsh=aXRxcmw4bjc5YThs');
+			Linking.openURL('https://www.instagram.com/olena_deoba?igsh=aXRxcmw4bjc5YThs');
 		};
 	};
 
 	const handleBackPress = () => {
 		navigation.toggleDrawer();
-		return true; // Prevent default back button behavior
+		return true;
 	};
 
 	useEffect(() => {

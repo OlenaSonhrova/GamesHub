@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRepeat } from '@fortawesome/free-solid-svg-icons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -44,13 +44,11 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		height: 40,
-		// backgroundColor: '#fc742b',
 		justifyContent: 'center',
 		alignItems: 'center',
 		gap: 20,
 	},
 	text: {
-		// paddingLeft: 20,
 		margin: 5,
 		color: 'white',
 		fontSize: 18,

@@ -1,6 +1,8 @@
-import React, { useState, createRef, useEffect } from 'react';
-import { StyleSheet, TextInput, View, Text, ScrollView, Image, Keyboard, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import React, { useState, createRef } from 'react';
+import { StyleSheet, TextInput, View, Text, ScrollView, Image, Keyboard, TouchableOpacity, KeyboardAvoidingView, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 import Loader from '../registration/components/loader';
 import { LoginUser } from '../api/api';
@@ -11,23 +13,10 @@ const LoginScreen = ({ navigation }) => {
 	const [userEmail, setUserEmail] = useState('');
 	const [userPassword, setUserPassword] = useState('');
 	const [loading, setLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 
 	const passwordInputRef = createRef();
 
-	useEffect(() => {
-		const getUserCredentials = async () => {
-			try {
-				const userEmails = await AsyncStorage.getItem('userEmail');
-				if (userEmails) {
-					setUserEmail(userEmails);
-				};
-			} catch (error) {
-				console.error('Error getting user credentials:', error);
-				return;
-			}
-		};
-		getUserCredentials();
-	}, []);
 
 	const handleSubmitPress = async () => {
 		if (!userEmail) { alert('Будь ласка, заповніть Nickname'); return; };
@@ -47,14 +36,13 @@ const LoginScreen = ({ navigation }) => {
 			} else {
 				await AsyncStorage.setItem('access', jsonData?.access);
 				await AsyncStorage.setItem('refresh', jsonData?.refresh);
-				await AsyncStorage.setItem('userEmail', userEmail);
 				setLoading(false);
 				navigation.replace('DrawerNavigator');
 			};
 		} catch (error) {
 			console.error('Error logging in:', error);
 		} finally {
-			setLoading(false); // <--- Move this here
+			setLoading(false);
 		};
 	};
 
@@ -87,7 +75,6 @@ const LoginScreen = ({ navigation }) => {
 								onChangeText={(UserEmail) =>
 									setUserEmail(UserEmail)
 								}
-								value={userEmail}
 								placeholder="Enter Nickname"
 								placeholderTextColor="#ffffff"
 								autoCapitalize="none"
@@ -101,23 +88,25 @@ const LoginScreen = ({ navigation }) => {
 								blurOnSubmit={false}
 							/>
 						</View>
-						<View style={styles.SectionStyle}>
+						<View style={styles.Eye}>
 							<TextInput
-								style={styles.inputStyle}
+							style={styles.inputStyleEye}
 								onChangeText={(UserPassword) =>
 									setUserPassword(UserPassword)
 								}
-								// value={userPassword}
-								placeholder="Enter Password" //12345
+								placeholder="Enter Password" 
 								placeholderTextColor="#ffffff"
 								keyboardType="default"
 								ref={passwordInputRef}
 								onSubmitEditing={Keyboard.dismiss}
 								blurOnSubmit={false}
-								secureTextEntry={true}
+								secureTextEntry={!showPassword}
 								underlineColorAndroid="#f000"
 								returnKeyType="next"
 							/>
+							<Pressable onPress={() => setShowPassword(!showPassword)}>
+								<FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} size={25} color='#8D6349' />
+							</Pressable>
 						</View>
 						<TouchableOpacity
 							style={styles.buttonStyle}
@@ -153,6 +142,21 @@ const styles = StyleSheet.create({
 		marginRight: 35,
 		margin: 10,
 	},
+	Eye: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginLeft: 35,
+		marginRight: 35,
+		height: 40,
+		justifyContent: 'space-between',
+		color: 'white',
+		paddingLeft: 15,
+		paddingRight: 15,
+		borderWidth: 1,
+		borderRadius: 30,
+		borderColor: 'black',
+	},
 	buttonStyle: {
 		backgroundColor: 'black',
 		borderWidth: 0,
@@ -179,6 +183,9 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderRadius: 30,
 		borderColor: 'black',
+	},
+	inputStyleEye: {
+		color: 'white',
 	},
 	registerTextStyle: {
 		color: '#FFFFFF',

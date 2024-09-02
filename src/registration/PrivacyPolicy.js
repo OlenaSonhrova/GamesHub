@@ -56,7 +56,7 @@ const PrivacyPolicy = ({ navigation }) => {
 	};
 
 	return (
-		<View style={{ backgroundColor: '#FFFAF0' }}>
+		<View style={{ backgroundColor: '#ffffff' }}>
 			<View style={styles.container}>
 				<Text style={styles.title}>Угода користувача та політика конфіденційності</Text>
 				<ScrollView style={styles.tcContainer} onScroll={handleScroll} onMomentumScrollEnd={handleScrollEnd}>
@@ -79,7 +79,8 @@ const styles = {
 	},
 	title: {
 		fontSize: 22,
-		alignSelf: 'center'
+		alignSelf: 'center',
+		color: '#363535cb',
 	},
 	
 	tcContainer: {

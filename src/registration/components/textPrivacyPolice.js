@@ -30,16 +30,19 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 		fontSize: 16,
 		fontWeight: '900',
+		color: '#363535cb',
 	},
 	tcL: {
 		marginBottom: 10,
 		fontSize: 14,
 		textAlign: 'justify',
+		color: '#363535cb',
 	},
 	tcLT: {
 		marginLeft: 10,
 		textAlign: 'justify',
 		marginBottom: 10,
+		color: '#363535cb',
 	},
 });
 

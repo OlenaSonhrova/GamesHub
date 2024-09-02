@@ -1,5 +1,7 @@
 import React, { useState, createRef } from 'react';
-import { StyleSheet, TextInput, View, Text, Image, KeyboardAvoidingView, TouchableOpacity, ScrollView,} from 'react-native';
+import { StyleSheet, TextInput, View, Text, Image, KeyboardAvoidingView, TouchableOpacity, ScrollView, Pressable, } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 import Loader from '../registration/components/loader';
 import { Register } from '../api/api';
@@ -9,6 +11,7 @@ const RegisterScreen = ({ navigation }) => {
 	const [userName, setUserName] = useState('');
 	const [userEmail, setUserEmail] = useState('');
 	const [userPassword, setUserPassword] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
 
 	const [loading, setLoading] = useState(false);
 
@@ -25,7 +28,7 @@ const RegisterScreen = ({ navigation }) => {
 		try {
 			const response = await Register(userName, userEmail, userPassword);
 			const jsonData = await response.json();
-			if (jsonData?.email[0] === 'custom user with this email already exists.' || jsonData?.username[0] === 'custom user with this username already exists.'){
+			if (jsonData?.email[0] === 'custom user with this email already exists.' || jsonData?.username[0] === 'custom user with this username already exists.') {
 				setLoading(false);
 				alert('Щось пішло не так. Користувач з таким Email або Nickname вже існує. Спробуйте ще раз'); return;
 			};
@@ -95,9 +98,9 @@ const RegisterScreen = ({ navigation }) => {
 							blurOnSubmit={false}
 						/>
 					</View>
-					<View style={styles.SectionStyle}>
+					<View style={styles.Eye}>
 						<TextInput
-							style={styles.inputStyle}
+						style={styles.inputStyleEye}
 							onChangeText={(UserPassword) =>
 								setUserPassword(UserPassword)
 							}
@@ -106,13 +109,16 @@ const RegisterScreen = ({ navigation }) => {
 							placeholderTextColor="#ffffff"
 							ref={passwordInputRef}
 							returnKeyType="next"
-							secureTextEntry={true}
+							secureTextEntry={!showPassword}
 							onSubmitEditing={() =>
 								ageInputRef.current &&
 								ageInputRef.current.focus()
 							}
 							blurOnSubmit={false}
 						/>
+						<Pressable onPress={() => setShowPassword(!showPassword)}>
+							<FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} size={25} color='#8D6349' />
+						</Pressable>
 					</View>
 					<TouchableOpacity
 						style={styles.buttonStyle}
@@ -173,5 +179,25 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontSize: 18,
 		padding: 30,
+	},
+	Eye: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginLeft: 35,
+		marginRight: 35,
+		marginTop: 20,
+		marginBottom: 20,
+		height: 40,
+		justifyContent: 'space-between',
+		color: 'white',
+		paddingLeft: 15,
+		paddingRight: 15,
+		borderWidth: 1,
+		borderRadius: 30,
+		borderColor: 'black',
+	},
+	inputStyleEye: {
+		color: 'white',
 	},
 });

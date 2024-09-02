@@ -70,7 +70,7 @@ cd android && ./gradlew assembleRelease
 Щоб зробити файл - AAB 
 переходимо в цю папку від імені адміністратора: C:\Program Files\Java\jdkx.x.x_x\bin 
 вводимо цю команду в терміналі: keytool -genkeypair -v -storetype PKCS12 -keystore my-upload-key.keystore -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000
-Розмістіть my-upload-key.keystoreфайл у android/appкаталозі папки проекту.
+Розмістіть my-upload-key.keystore файл у android/appкаталозі папки проекту.
 Відредагуйте файл ~/.gradle/gradle.propertiesабо android/gradle.propertiesта додайте наступне (замініть *****правильним паролем сховища ключів, псевдонімом і паролем ключа),
 MYAPP_UPLOAD_STORE_FILE=my-upload-key.keystore
 MYAPP_UPLOAD_KEY_ALIAS=my-key-alias

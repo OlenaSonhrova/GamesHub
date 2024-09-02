@@ -6,6 +6,7 @@ import Games from "../games/games";
 import Search from "../search/search";
 import Likedd from "../Liked/Liked";
 import MyGamess from "../MyGames/MyGames";
+import PlayedGames from "../Played/played";
 
 import GamesByCategories from "../games/GamesByCategories";
 
@@ -25,11 +26,9 @@ const screenOptionStyle = {
 const GamesStackNavigator = ({ offline, statusServer }) => {
 	return (
 		<Stack.Navigator screenOptions={screenOptionStyle}>
-			{/* <Stack.Screen name="GamesStack" component={Games} /> */}
 			<Stack.Screen name="GamesStack">
 				{() => <Games offline={offline} statusServer={statusServer}/>}
 			</Stack.Screen>
-			{/* <Stack.Screen name="Ігри" component={GamesByCategories} options={{ headerShown: true }} /> */}
 			<Stack.Screen name="Ігри" options={{ headerShown: true }}>
 				{() => <GamesByCategories offline={offline} statusServer={statusServer}/>}
 			</Stack.Screen>
@@ -47,19 +46,22 @@ const SearchStackNavigator = ({ offline, statusServer }) => {
 	);
 }
 
-// const SearchStackNavigator = () => {
-// 	return (
-// 		<Stack.Navigator screenOptions={screenOptionStyle}>
-// 			<Stack.Screen name="SearchStack" component={Search} />
-// 		</Stack.Navigator>
-// 	);
-// }
 
 const Liked = ({ offline, statusServer }) => {
 	return (
 		<Stack.Navigator screenOptions={screenOptionStyle}>
 			<Stack.Screen name="LikedStack">
 				{() => <Likedd offline={offline} statusServer={statusServer} />}
+			</Stack.Screen>
+		</Stack.Navigator>
+	);
+}
+
+const Played = ({ offline, statusServer }) => {
+	return (
+		<Stack.Navigator screenOptions={screenOptionStyle}>
+			<Stack.Screen name="LikedStack">
+				{() => <PlayedGames offline={offline} statusServer={statusServer} />}
 			</Stack.Screen>
 		</Stack.Navigator>
 	);
@@ -76,4 +78,4 @@ const MyGames = ({ offline, statusServer }) => {
 }
 
 
-export { GamesStackNavigator, SearchStackNavigator, Liked, MyGames };
+export { GamesStackNavigator, SearchStackNavigator, Liked, MyGames, Played };

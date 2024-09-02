@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import TextPrivacyPolice from '../registration/components/textPrivacyPolice';
 
 const UserAgreement = () => {
