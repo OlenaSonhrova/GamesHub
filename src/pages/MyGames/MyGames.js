@@ -35,7 +35,7 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 		{
 			queryKey: ["GetUserCreatedGames"],
 			queryFn: () => GetUserCreatedGames('/core/getUserCreatedGames/', navigation),
-			retry: 1,
+			retry: 0,
 		},
 	);
 
@@ -106,7 +106,7 @@ const MyGamess = ({ navigation, offline, statusServer }) => {
 		const backHandler = () => {
 			if (addGameVisible) {
 				setAddGameVisible(false);
-				console.log('умови дві +');
+				// console.log('умови дві +');
 				return true;
 			}
 			return false;

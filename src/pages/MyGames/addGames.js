@@ -75,10 +75,6 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 	};
 
 	useEffect(() => {
-		getDataInfa();
-	}, []);
-
-	useEffect(() => {
 		if (offline) {
 		} else {
 			getDataInfa();
@@ -112,6 +108,7 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 				player_age: selectedAge,
 				locations: selectedLocation,
 				money_range: selectedMoney,
+				link_to_site: urlName,
 				is_private: toggleSwitch
 			});
 			const nameUrl = '/core/updateUserGame/';
@@ -199,6 +196,15 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 						value={description}
 						textAlignVertical="top"
 					/>
+					<TextInput
+						style={styles.input}
+						placeholder="Посилання на гру (url)"
+						keyboardType="default"
+						placeholderTextColor="black"
+						onChangeText={text => setUrlName(text)}
+						maxLength={255}
+						value={urlName}
+					/>
 					<Text style={styles.valueText}>Категорія: *</Text>
 					<View style={styles.block}>
 						{type.map((typeItem, index) => {
@@ -284,20 +290,8 @@ const AddGame = ({ navigation, returnedDataAdd, returnedDataUp, item, upDate, of
 							);
 						})}
 					</View>
-					<View>
-						<Text style={styles.valueText}>Посилання на гру: </Text>
-						<TextInput
-							style={styles.input}
-							placeholder="url адреса"
-							keyboardType="default"
-							placeholderTextColor="black"
-							onChangeText={text => setUrlName(text)}
-							maxLength={255}
-							value={urlName}
-						/>
-					</View>
 					<View style={styles.containerSwitch}>
-						<Text style={styles.containerSwitchText}>Приватна гра: * </Text>
+						<Text style={styles.containerSwitchText}>Приватна гра: </Text>
 						<Switch
 							trackColor={{ false: '#FAE2D4', true: '#B66A53' }}
 							style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }], marginTop: 10, }}

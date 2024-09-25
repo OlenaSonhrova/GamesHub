@@ -127,7 +127,7 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 		<View style={styles.center}>
 			<FlatList
 				data={newData}
-				style={{ flex: 1 }}
+				style={{ flex: 1}}
 				windowSize={10}
 				extraData={refreshing}
 				refreshControl={
@@ -172,18 +172,18 @@ const FlatListComponent = ({ data, image, refreshing, onRefresh, navigation, ima
 										setPlayedGame(item.name, item.is_played)
 									}
 								}}>
-									<FontAwesomeIcon icon={faSquareCheck} size={30} color={item.is_played === undefined ? 'black' : item.is_played ? 'black' : '#8f7878'} />
+									<FontAwesomeIcon icon={faSquareCheck} size={30} color={item.is_played === undefined ? '#1b851b' : item.is_played ? '#1b851b' : '#8f7878'} />
 								</Pressable>
 							</View>
 						</Pressable>
 					</View>
 				)}
 				ListFooterComponent={() => (
-					<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 30, fontWeight: 'bold' }}> </Text>
+					<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 70, fontWeight: 'bold' }}> </Text>
 				)}
 			/>
 			{
-				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={(hasInteracted) => { setGamePressed(null); if (hasInteracted) { onRefresh(); } }} setSelectedGame={setSelectedGame} offline={offline} />
+				gamePressed && (<ModalComponent gamePressed={gamePressed} onClose={(hasInteracted) => { setGamePressed(null); if (hasInteracted) { onRefresh(); } }} setSelectedGame={setSelectedGame} setPlayedGame={setPlayedGame} offline={offline} />
 				)}
 		</View>
 	);
@@ -235,19 +235,16 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 
-
 	},
 	blockHeart: {
 		paddingHorizontal: 15,
 		paddingVertical: 22,
-		// borderColor: 'black',
-		// borderWidth: 1,
+
 	},
 	blockCheck: {
 		paddingHorizontal: 15,
 		paddingVertical: 22,
-		// borderColor: 'black',
-		// borderWidth: 1,
+
 	},
 });
 

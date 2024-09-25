@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { Calendar } from 'react-native-calendars';
@@ -36,7 +36,7 @@ const Search = ({ navigation, offline, statusServer }) => {
 
 	const [data, setData] = useState([]);
 	const [refreshing, setRefreshing] = useState(false);
-	const [moreOption, setMoreOption] = useState(true);
+	const [moreOption, setMoreOption] = useState(false);
 	const [showCalendar, setShowCalendar] = useState(true);
 
 
@@ -80,6 +80,7 @@ const Search = ({ navigation, offline, statusServer }) => {
 		};
 		asyncFunction();
 	}, [selectType, selectDuration, selectCountPlayers, selectAge, selectLocation, selectMoney, name, props, description, selectRating, author, selectedDate]);
+
 
 	const searchGames = async () => {
 		try {
@@ -125,259 +126,251 @@ const Search = ({ navigation, offline, statusServer }) => {
 				<View>
 					<View style={styles.request}>
 						<Text style={{ fontSize: 24, fontWeight: 700, textAlign: 'center', color: 'black', paddingBottom: 10 }}>Пошук ігор</Text>
-						<View style={styles.blockOne} >
+						<View style={styles.blockHeadInput} >
 							<TextInput
-								style={[styles.inputName, styles.input]}
-								placeholder="  Назва гри"
+								style={styles.input}
+								placeholder="Назва гри"
 								placeholderTextColor="black"
 								keyboardType="default"
 								onChangeText={text => text === "" ? setName(null) : setName(text)}
 								value={name}
 							/>
-							<Pressable style={styles.visibalaitiMore} onPress={() => { setMoreOption(!moreOption) }}>
-								<Text style={{ fontSize: 18, fontWeight: 500, color: 'black' }}>Інші параметри</Text>
-								<FontAwesomeIcon icon={faCaretDown} size={30} color='#8D6349' />
-							</Pressable>
-						</View>
-
-						<View style={[styles.blockMoreOption, { display: moreOption ? 'none' : '' }]}>
-							<View style={styles.blockTwo}>
-								<TextInput
-									style={[styles.inputName, styles.input]}
-									placeholder="  Реквізит"
-									placeholderTextColor="black"
-									keyboardType="default"
-									onChangeText={text => text === "" ? setProps(null) : setProps(text)}
-									value={props}
-								/>
-								<TextInput
-									style={[styles.inputName, styles.input]}
-									placeholder="  Автор гри"
-									placeholderTextColor="black"
-									keyboardType="default"
-									onChangeText={text => text === "" ? setAuthor(null) : setAuthor(text)}
-									value={author}
-								/>
-							</View>
 							<TextInput
-								style={[styles.input, styles.inputLast]}
-								placeholder="  Основне завдання"
+								style={styles.input}
+								placeholder="Реквізит"
+								placeholderTextColor="black"
+								keyboardType="default"
+								onChangeText={text => text === "" ? setProps(null) : setProps(text)}
+								value={props}
+							/>
+							<TextInput
+								style={styles.input}
+								placeholder="Автор гри"
+								placeholderTextColor="black"
+								keyboardType="default"
+								onChangeText={text => text === "" ? setAuthor(null) : setAuthor(text)}
+								value={author}
+							/>
+							<TextInput
+								style={styles.input}
+								placeholder="Основне завдання"
 								placeholderTextColor="black"
 								keyboardType="default"
 								onChangeText={text => text === "" ? setDescription(null) : setDescription(text)}
 								value={description}
 							/>
-
-							<View style={styles.blockCateori}>
-								<SelectDropdown
-									data={type}
-									key={selectType || "defaultKey1"}
-									onSelect={(selectedItem) => {
-										if (selectedItem === selectType) {
-											setSelectType(null);
-										} else {
-											setSelectType(selectedItem);
-										};
-									}}
-									defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectType ?? 'Категорії'}</Text>}
-									buttonStyle={{
-										backgroundColor: selectType ? '#bebebe' : '#FAE2D4',
-										width: '49%',
-										height: 35,
-										marginBottom: 2,
-									}}
-									selectedRowStyle={{
-										backgroundColor: '#bebebe',
-									}}
-									defaultValue={selectType}
-								/>
-								<SelectDropdown
-									data={duration}
-									key={selectDuration || "defaultKey2"}
-									onSelect={(selectedItem) => {
-										if (selectedItem === selectDuration) {
-											setSelectDuration(null);
-										} else {
-											setSelectDuration(selectedItem);
-										};
-									}}
-									defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectDuration ?? 'Тривалість гри'}</Text>}
-									buttonStyle={{
-										backgroundColor: selectDuration ? '#bebebe' : '#FAE2D4',
-										width: '49%',
-										height: 35,
-										marginBottom: 2,
-									}}
-									selectedRowStyle={{
-										backgroundColor: '#bebebe',
-									}}
-									defaultValue={selectDuration}
-								/>
-								<SelectDropdown
-									data={age}
-									key={selectAge || "defaultKey3"}
-									onSelect={(selectedItem) => {
-										if (selectedItem === selectAge) {
-											setSelectAge(null);
-										} else {
-											setSelectAge(selectedItem);
-										};
-									}}
-									defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectAge ?? 'Вік'}</Text>}
-									buttonStyle={{
-										backgroundColor: selectAge ? '#bebebe' : '#FAE2D4',
-										width: '49%',
-										height: 35,
-										marginBottom: 2,
-									}}
-									selectedRowStyle={{
-										backgroundColor: '#bebebe',
-									}}
-									defaultValue={selectAge}
-								/>
-								<SelectDropdown
-									data={location}
-									key={selectLocation || "defaultKey4"}
-									onSelect={(selectedItem) => {
-										if (selectedItem === selectLocation) {
-											setSelectLocation(null);
-										} else {
-											setSelectLocation(selectedItem);
-										};
-									}}
-									defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectLocation ?? 'Локація'}</Text>}
-									buttonStyle={{
-										backgroundColor: selectLocation ? '#bebebe' : '#FAE2D4',
-										width: '49%',
-										height: 35,
-										marginBottom: 2,
-									}}
-									selectedRowStyle={{
-										backgroundColor: '#bebebe',
-									}}
-									defaultValue={selectLocation}
-								/>
-
-								<SelectDropdown
-									data={money}
-									key={selectMoney || "defaultKey5"}
-									onSelect={(selectedItem) => {
-										if (selectedItem === selectMoney) {
-											setSelectMoney(null);
-										} else {
-											setSelectMoney(selectedItem);
-										};
-									}}
-									defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectMoney ?? 'Фінанси'}</Text>}
-									buttonStyle={{
-										backgroundColor: selectMoney ? '#bebebe' : '#FAE2D4',
-										width: '49%',
-										height: 35,
-										marginBottom: 2,
-									}}
-									selectedRowStyle={{
-										backgroundColor: '#bebebe',
-									}}
-									defaultValue={selectMoney}
-								/>
-								<SelectDropdown
-									data={rating}
-									key={selectRating || "defaultKey6"}
-									onSelect={(selectedItem, index) => {
-										if (selectRating === index) {
-											setSelectRating(null);
-										} else {
-											setSelectRating(index);
-										};
-									}}
-									defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectRating !== null ? rating[selectRating] : 'Рейтинг'}</Text>}
-									buttonStyle={{
-										backgroundColor: selectRating ? '#bebebe' : '#FAE2D4',
-										width: '49%',
-										height: 35,
-										marginBottom: 2,
-									}}
-									selectedRowStyle={{
-										backgroundColor: '#bebebe',
-									}}
-									defaultValue={rating[selectRating]}
-								/>
-								<SelectDropdown
-									data={countPlayers}
-									key={selectCountPlayers || "defaultKey7"}
-									onSelect={(selectedItem) => {
-										if (selectedItem === selectCountPlayers) {
-											setSelectCountPlayers(null);
-										} else {
-											setSelectCountPlayers(selectedItem);
-										};
-									}}
-									defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectCountPlayers ?? 'Кількість учасників'}</Text>}
-									buttonStyle={{
-										backgroundColor: selectCountPlayers ? '#bebebe' : '#FAE2D4',
-										width: '100%',
-										height: 35,
-										marginBottom: 5,
-									}}
-									selectedRowStyle={{
-										backgroundColor: '#bebebe',
-									}}
-									defaultValue={selectCountPlayers}
-								/>
-								<View style={{ width: '100%', }}>
-									<Pressable onPress={() => { setShowCalendar(!showCalendar) }}>
-										<Text
+						</View>
+						<Pressable style={styles.visibalaitiMore} onPress={() => { setMoreOption(!moreOption) }}>
+							<Text style={{ fontSize: 18, fontWeight: 500, color: 'black' }}>Інші параметри</Text>
+							<FontAwesomeIcon icon={faCaretDown} size={30} color='#8D6349' />
+						</Pressable>
+						<View style={[styles.blockCateori, moreOption ? styles.open : styles.closed]}>
+							<SelectDropdown
+								data={type}
+								key={selectType || "defaultKey1"}
+								onSelect={(selectedItem) => {
+									if (selectedItem === selectType) {
+										setSelectType(null);
+									} else {
+										setSelectType(selectedItem);
+									};
+								}}
+								defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectType ?? 'Категорії'}</Text>}
+								buttonStyle={{
+									backgroundColor: selectType ? '#bebebe' : '#FAE2D4',
+									width: '49%',
+									height: 35,
+									marginBottom: 2,
+								}}
+								selectedRowStyle={{
+									backgroundColor: '#bebebe',
+								}}
+								defaultValue={selectType}
+							/>
+							<SelectDropdown
+								data={duration}
+								key={selectDuration || "defaultKey2"}
+								onSelect={(selectedItem) => {
+									if (selectedItem === selectDuration) {
+										setSelectDuration(null);
+									} else {
+										setSelectDuration(selectedItem);
+									};
+								}}
+								defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectDuration ?? 'Тривалість гри'}</Text>}
+								buttonStyle={{
+									backgroundColor: selectDuration ? '#bebebe' : '#FAE2D4',
+									width: '49%',
+									height: 35,
+									marginBottom: 2,
+								}}
+								selectedRowStyle={{
+									backgroundColor: '#bebebe',
+								}}
+								defaultValue={selectDuration}
+							/>
+							<SelectDropdown
+								data={age}
+								key={selectAge || "defaultKey3"}
+								onSelect={(selectedItem) => {
+									if (selectedItem === selectAge) {
+										setSelectAge(null);
+									} else {
+										setSelectAge(selectedItem);
+									};
+								}}
+								defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectAge ?? 'Вік'}</Text>}
+								buttonStyle={{
+									backgroundColor: selectAge ? '#bebebe' : '#FAE2D4',
+									width: '49%',
+									height: 35,
+									marginBottom: 2,
+								}}
+								selectedRowStyle={{
+									backgroundColor: '#bebebe',
+								}}
+								defaultValue={selectAge}
+							/>
+							<SelectDropdown
+								data={location}
+								key={selectLocation || "defaultKey4"}
+								onSelect={(selectedItem) => {
+									if (selectedItem === selectLocation) {
+										setSelectLocation(null);
+									} else {
+										setSelectLocation(selectedItem);
+									};
+								}}
+								defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectLocation ?? 'Локація'}</Text>}
+								buttonStyle={{
+									backgroundColor: selectLocation ? '#bebebe' : '#FAE2D4',
+									width: '49%',
+									height: 35,
+									marginBottom: 2,
+								}}
+								selectedRowStyle={{
+									backgroundColor: '#bebebe',
+								}}
+								defaultValue={selectLocation}
+							/>
+							<SelectDropdown
+								data={money}
+								key={selectMoney || "defaultKey5"}
+								onSelect={(selectedItem) => {
+									if (selectedItem === selectMoney) {
+										setSelectMoney(null);
+									} else {
+										setSelectMoney(selectedItem);
+									};
+								}}
+								defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectMoney ?? 'Фінанси'}</Text>}
+								buttonStyle={{
+									backgroundColor: selectMoney ? '#bebebe' : '#FAE2D4',
+									width: '49%',
+									height: 35,
+									marginBottom: 2,
+								}}
+								selectedRowStyle={{
+									backgroundColor: '#bebebe',
+								}}
+								defaultValue={selectMoney}
+							/>
+							<SelectDropdown
+								data={rating}
+								key={Math.random()}
+								onSelect={(selectedItem, index) => {
+									if (selectRating === index) {
+										setSelectRating(null);
+									} else {
+										setSelectRating(index);
+									};
+								}}
+								defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectRating !== null ? rating[selectRating] : 'Рейтинг'}</Text>}
+								buttonStyle={{
+									backgroundColor: rating[selectRating] ? '#bebebe' : '#FAE2D4',
+									width: '49%',
+									height: 35,
+									marginBottom: 2,
+								}}
+								selectedRowStyle={{
+									backgroundColor: '#bebebe',
+								}}
+								defaultValue={rating[selectRating]}
+							/>
+							<SelectDropdown
+								data={countPlayers}
+								key={selectCountPlayers || "defaultKey7"}
+								onSelect={(selectedItem) => {
+									if (selectedItem === selectCountPlayers) {
+										setSelectCountPlayers(null);
+									} else {
+										setSelectCountPlayers(selectedItem);
+									};
+								}}
+								defaultButtonText={<Text style={{ color: '#AAAAAA' }}>{selectCountPlayers ?? 'Кількість учасників'}</Text>}
+								buttonStyle={{
+									backgroundColor: selectCountPlayers ? '#bebebe' : '#FAE2D4',
+									width: '100%',
+									height: 35,
+									marginBottom: 5,
+								}}
+								selectedRowStyle={{
+									backgroundColor: '#bebebe',
+								}}
+								defaultValue={selectCountPlayers}
+							/>
+							<View style={{ width: '100%', }}>
+								<Pressable onPress={() => { setShowCalendar(!showCalendar) }}>
+									<Text
+										style={{
+											display: showCalendar ? 'flex' : 'none',
+											color: '#AAAAAA',
+											fontSize: 18,
+											textAlign: 'center',
+											backgroundColor: selectedDate ? '#bebebe' : '#FAE2D4',
+											height: 35,
+											paddingTop: 8,
+											marginBottom: 10,
+										}}
+									>
+										{showCalendar ? (selectedDate !== undefined && selectedDate !== null ? selectedDate : 'Дата з якої шукати ігри') : ''}
+									</Text>
+									<View style={styles.calendarWrapper}>
+										<Calendar
 											style={{
-												display: showCalendar ? 'flex' : 'none',
-												color: '#AAAAAA',
-												fontSize: 18,
-												textAlign: 'center',
-												backgroundColor: selectedDate ? '#bebebe' : '#FAE2D4',
-												height: 35,
-												paddingTop: 8,
-												marginBottom: 10,
+												display: showCalendar ? 'none' : '',
 											}}
-										>
-											{showCalendar ? (selectedDate !== undefined && selectedDate !== null ? selectedDate : 'Дата з якої шукати ігри') : ''}
-										</Text>
-										<View style={styles.calendarWrapper}>
-											<Calendar
-												style={{
-													display: showCalendar ? 'none' : '',
-												}}
-												onDayPress={(day) => {
-													const [year, month, dayOfMonth] = day.dateString.split('-');
-													const formattedDate = `${year}/${month}/${dayOfMonth}`;
-													if (selectedDate === formattedDate) {
-														setShowCalendar(!showCalendar);
-														setSelectedDateFormat(day.dateString);
-														setSelectedDate(null);
-													} else {
-														setShowCalendar(!showCalendar)
-														setSelectedDateFormat(day.dateString);
-														setSelectedDate(formattedDate);
-													};
-												}}
-												markingType={'custom'}
-												markedDates={{
-													[selectedDateFormat]: { selected: true, selectedColor: '#06649a' },
-												}}
-											/>
-										</View>
+											onDayPress={(day) => {
+												const [year, month, dayOfMonth] = day.dateString.split('-');
+												const formattedDate = `${year}/${month}/${dayOfMonth}`;
+												if (selectedDate === formattedDate) {
+													setShowCalendar(!showCalendar);
+													setSelectedDateFormat(day.dateString);
+													setSelectedDate(null);
+												} else {
+													setShowCalendar(!showCalendar)
+													setSelectedDateFormat(day.dateString);
+													setSelectedDate(formattedDate);
+												};
+											}}
+											markingType={'custom'}
+											markedDates={{
+												[selectedDateFormat]: { selected: true, selectedColor: '#06649a' },
+											}}
+										/>
+									</View>
 
-									</Pressable>
-								</View>
+								</Pressable>
 							</View>
-
 						</View>
 					</View>
-					<View style={styles.responce}>
+
+					<View style={[styles.responce, { height: moreOption ? '49%' : '77%' }]}>
 						{data.length === 0 && !refreshing ? (
-							<Text style={{ fontSize: 18, fontWeight: 500, color: 'black' }}>Нічого не знайдено ...</Text>
+							<Text style={{ fontSize: 18, fontWeight: 500, color: 'black', marginLeft: 5 }}>Нічого не знайдено ...</Text>
 						) : (
 							<FlatListComponent data={data} refreshing={refreshing} onRefresh={onRefresh} imageLocal={imageLocal} />
 						)}
-						<Text style={{ display: 'none' }}>JSFvkdfv ksjvb</Text>
 					</View>
 				</View>
 			)}
@@ -386,44 +379,43 @@ const Search = ({ navigation, offline, statusServer }) => {
 };
 
 const styles = StyleSheet.create({
+
 	backgroundColor: {
-		height: '100%',
 		margin: 10,
 	},
 	request: {
-		paddingBottom: 15,
+		flexGrow: 1,
 	},
 	responce: {
-		height: '85%',
+		flexGrow: 1,
+		overflow: 'hidden',
 	},
 	blockCateori: {
 		display: 'flex',
 		flexDirection: 'row',
-		gap: 1,
+		gap: 2,
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
+		height: 0,
+		overflow: 'hidden',
 	},
-	blockOne: {
+	open: {
+		height: 'auto',
+	},
+	closed: {
+		height: 0,
+	},
+	blockHeadInput: {
 		display: 'flex',
 		flexDirection: 'row',
-		gap: 20,
-	},
-	blockTwo: {
-		display: 'flex',
-		flexDirection: 'row',
-		gap: 15,
+		flexWrap: 'wrap',
 	},
 	input: {
 		height: 35,
-		marginTop: 1,
-		marginBottom: 3,
+		margin: 3,
 		borderWidth: 1,
-	},
-	inputName: {
+		padding: 10,
 		width: '48%',
-	},
-	inputLast: {
-		marginBottom: 10,
 	},
 	text: {
 		color: 'black',
@@ -434,7 +426,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		gap: 10,
 		alignItems: 'center',
-		width: '45%'
+		marginLeft: 3,
 	},
 });
 

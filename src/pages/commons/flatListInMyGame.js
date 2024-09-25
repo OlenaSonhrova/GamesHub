@@ -102,7 +102,7 @@ const FlatListInMyGame = ({ data, image, refreshing, onRefresh, navigation, imag
 					</View>
 				)}
 				ListFooterComponent={() => (
-					<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 30, fontWeight: 'bold' }}> </Text>
+					<Text style={{ fontSize: 30, textAlign: "center", marginBottom: 50, fontWeight: 'bold' }}> </Text>
 				)}
 			/>
 			{

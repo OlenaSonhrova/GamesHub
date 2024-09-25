@@ -31,7 +31,7 @@ const Games = ({ offline, statusServer }) => {
 		{
 			queryKey: ["getAllGameTypes"],
 			queryFn: () => getAllGameTypes('/core/getAllGameTypes/', navigation),
-			retry: 1,
+			retry: 0,
 		},
 	);
 

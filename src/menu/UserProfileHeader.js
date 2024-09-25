@@ -13,7 +13,7 @@ const UserProfileHeader = ({ navigation }) => {
 		{
 			queryKey: ["getUserInfo"],
 			queryFn: () => GetUserInfo(navigation),
-			retry: 1,
+			retry: 0,
 		},
 	);
 

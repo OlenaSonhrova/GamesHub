@@ -20,7 +20,8 @@ export default App;
 
 
 
-
+minifyEnabled enableProguardInReleaseBuilds
+shrinkResources true
 
 
 ========================================================================================

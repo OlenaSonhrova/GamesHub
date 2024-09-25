@@ -53,7 +53,7 @@ const Help = ({ navigation }) => {
 
 				<TouchableOpacity style={styles.contactsItem} onPress={() => onPtressUrl(3)}>
 					<Image style={styles.contactsItemImage} source={require('../image/insta.png')}></Image>
-					<Text style={styles.textContacts}>@olena_sonhrova</Text>
+					<Text style={styles.textContacts}>@olena_deoba</Text>
 				</TouchableOpacity>
 
 			</View>

@@ -37,7 +37,7 @@ const PlayedGames = ({ navigation, offline, statusServer }) => {
 		{
 			queryKey: ["GetUserPlayedGames"],
 			queryFn: () => GetUserPlayedGames('/core/getUserPlayedGames/', navigation),
-			retry: 1,
+			retry: 0,
 		},
 	);
 

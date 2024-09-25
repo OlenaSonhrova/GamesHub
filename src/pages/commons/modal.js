@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Alert, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHeart, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faArrowLeft, faLocationDot, faUsers, faStopwatch, faFaceSmile, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
 
 
 import RatingGame from './raiting';
 
 
-const ModalComponent = ({ gamePressed, onClose, setSelectedGame, offline }) => {
+const ModalComponent = ({ gamePressed, onClose, setSelectedGame, setPlayedGame, offline }) => {
 
 	const [modalVisible, setModalVisible] = useState(true);
 
@@ -19,7 +19,9 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame, offline }) => {
 	// console.log('gamePdffgbressed', gamePressed);
 
 	const [selectedHard, setSelectedHard] = useState(gamePressed.is_selected);
+	const [selecteCheck, setSelectedCheck] = useState(gamePressed.is_played);
 	const [hasInteracted, setHasInteracted] = useState(false);
+	const [hasInteractedPlayed, setHasInteractedPlayed] = useState(false);
 	const [hasInteractedRating, setHasInteractedRating] = useState(false);
 
 	const checkChangeUserRating = (rating) => {
@@ -32,7 +34,7 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame, offline }) => {
 
 	const closeModal = () => {
 		setModalVisible(false);
-		if (hasInteracted || hasInteractedRating) {
+		if (hasInteracted || hasInteractedRating || hasInteractedPlayed) {
 			onClose(true);
 		} else {
 			onClose(false);
@@ -52,6 +54,22 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame, offline }) => {
 		setHasInteracted(!hasInteracted);
 		if (selected !== undefined) {
 			setSelectedHard(!selectedHard);
+		}
+	};
+
+	const playedGame = async (name, played) => {
+		if (offline) {
+			Alert.alert("Повідомлення", "Функція доступа тільки в онлайні");
+			return;
+		};
+		const isPlayed = played !== undefined ? played : (setSelectedCheck(false), true);
+		const response = await setPlayedGame(name, isPlayed);
+		if (response !== 200) {
+			return;
+		};
+		setHasInteractedPlayed(!hasInteractedPlayed);
+		if (played !== undefined) {
+			setSelectedCheck(!selecteCheck);
 		}
 	};
 
@@ -82,6 +100,13 @@ const ModalComponent = ({ gamePressed, onClose, setSelectedGame, offline }) => {
 									<FontAwesomeIcon icon={faHeart} size={30} color={selectedHard || selectedHard === undefined ? 'red' : 'black'} />
 								</Pressable>
 							</View>
+
+							<View>
+								<Pressable style={styles.faSquareCheck} onPress={() => playedGame(gamePressed.name, selecteCheck)}>
+									<FontAwesomeIcon icon={faSquareCheck} size={30} color={selecteCheck || selecteCheck === undefined ? '#1b851b' : 'black'} />
+								</Pressable>
+							</View>
+
 						</View>
 						<RatingGame idGame={gamePressed.name} userRating={gamePressed.user_rating} checkChangeUserRating={checkChangeUserRating} offline={offline} />
 					</View>
@@ -159,6 +184,8 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
+		paddingRight: 40,
+		gap: 10,
 	},
 	faHeart: {
 		padding: 30,

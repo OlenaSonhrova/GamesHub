@@ -32,7 +32,7 @@ const Likedd = ({ navigation, offline, statusServer }) => {
 		{
 			queryKey: ["GetUserSelectedGames"],
 			queryFn: () => GetUserSelectedGames('/core/getUserSelectedGames/', navigation),
-			retry: 1,
+			retry: 0,
 		},
 	);
 

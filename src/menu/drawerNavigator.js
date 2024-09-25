@@ -28,7 +28,7 @@ const DrawerNavigator = ({ navigation }) => {
 		{
 			queryKey: ["changeInternet"],
 			queryFn: () => ChangeInternet(navigation),
-			retry: 1,
+			retry: 0,
 		},
 	);
 
