@@ -11,11 +11,18 @@
 - react-dom
 - react-query
 - react-router
+- react-native
 - react-router-dom
+- node
 - axios
 - json-server
 - react-scripts
 - web-vitals
+- free-solid-svg-icons
+- react-native-reanimated
+- use-local-storage-state
+- react-native-easy-rating
+
 
 # Available Scripts
 
