@@ -1,6 +1,6 @@
 # Games Hub
 
-Welcome to our mobile app "Games Hub" – your companion for unforgettable games and entertainment anytime, anywhere! Whether you're outdoors or indoors, with our app, you'll find a wide variety of exciting games for all age groups and event types.
+"Games Hub" is an app where users can find games to organize leisure activities for children, teenagers, young adults, and adults. Users can either use existing games or create and add their own. The app works in both online and offline modes, but not all features are available in offline mode.
 
 <p align="center">
 <img src="https://github.com/OlenaSonhrova/image/blob/main/GamesHubGif.gif?raw=true" width="150">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp<img src="https://github.com/OlenaSonhrova/image/blob/main/GamesHub1.jpg?raw=true" width="150">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/OlenaSonhrova/image/blob/main/GamesHub2.jpg?raw=true" width="150">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/OlenaSonhrova/image/blob/main/GamesHub5.jpg?raw=true" width="150">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp<img src="https://github.com/OlenaSonhrova/image/blob/main/GamesHub7.jpg?raw=true" width="150">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp<img src="https://github.com/OlenaSonhrova/image/blob/main/GamesHub8.jpg?raw=true" width="150">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp<img src="https://github.com/OlenaSonhrova/image/blob/main/GamesHub9.jpg?raw=true" width="150">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp
