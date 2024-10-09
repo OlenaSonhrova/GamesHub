@@ -112,7 +112,7 @@ For Windows, add these paths through "Environment Variables" in the system setti
      ```bash
      npx react-native run-ios
    
-     Alternatively, you can open the .xcworkspace file in Xcode and run the app from there.
+   Alternatively, you can open the .xcworkspace file in Xcode and run the app from there.
 
 6. Troubleshooting:
 
