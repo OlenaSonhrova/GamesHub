@@ -92,26 +92,30 @@ For Windows, add these paths through "Environment Variables" in the system setti
 5. iOS Installation (for macOS users):
 
    - Install Xcode
-        Ensure that Xcode is installed from the Mac App Store. This is necessary for running your React Native project on iOS.
+     
+     Ensure that Xcode is installed from the Mac App Store. This is necessary for running your React Native project on iOS.
    - Install CocoaPods:
-         CocoaPods is a dependency manager for iOS. Install it if you haven't already:
-         ```bash
-         sudo gem install cocoapods
+     
+     CocoaPods is a dependency manager for iOS. Install it if you haven't already:
+     ```bash
+     sudo gem install cocoapods
+     
    - Navigate to the ios folder of your project and install iOS dependencies:
          ```bash
          cd ios
          pod install
          cd ..
    - Run the iOS app: You can run the app on an iOS simulator or a real device. For the simulator:
-         ```bash
-         npx react-native run-ios
+     ```bash
+     npx react-native run-ios
    
-       Alternatively, you can open the .xcworkspace file in Xcode and run the app from there.
+     Alternatively, you can open the .xcworkspace file in Xcode and run the app from there.
 
-6. Troubleshooting: 
-   If you encounter errors, check whether all dependencies and tools are installed correctly and make sure your device or emulator is properly connected.
+6. Troubleshooting:
+
+If you encounter errors, check whether all dependencies and tools are installed correctly and make sure your device or emulator is properly connected.
    
-   Once done, your app should run on Android.
+Once done, your app should run on Android.
 
 
 
