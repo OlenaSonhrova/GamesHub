@@ -72,8 +72,9 @@ To run this project locally, follow these steps:
    export PATH=$PATH:$ANDROID_HOME/tools
    export PATH=$PATH:$ANDROID_HOME/tools/bin
    export PATH=$PATH:$ANDROID_HOME/platform-tools
+
    
-   For Windows, add these paths through "Environment Variables" in the system settings.
+For Windows, add these paths through "Environment Variables" in the system settings.
 
    - Start an emulator or connect a device:
    
