@@ -101,10 +101,12 @@ For Windows, add these paths through "Environment Variables" in the system setti
      sudo gem install cocoapods
      
    - Navigate to the ios folder of your project and install iOS dependencies:
-         ```bash
-         cd ios
-         pod install
-         cd ..
+     
+     ```bash
+     cd ios
+     pod install
+     cd ..
+     
    - Run the iOS app: You can run the app on an iOS simulator or a real device. For the simulator:
      ```bash
      npx react-native run-ios
