@@ -61,7 +61,7 @@ To run this project locally, follow these steps:
    
 2. Navigate to the project directory:
    ```bash
-   cd react_first
+   cd GamesHub
    
 3. Install dependencies:
    
@@ -69,15 +69,17 @@ To run this project locally, follow these steps:
    ```bash
    npm install
    
-4. Install Android SDK:
-   
-   Ensure you have Android Studio installed and the Android SDK set up. If you don’t have it installed:
-   - Download and install Android Studio.
-   - During the installation, make sure you add necessary SDK components such as Android SDK and Android Virtual Device (AVD).
+4. Android Installation:
+
+   - Install Android SDK:
      
-5. Set environment variables:
+      Ensure you have Android Studio installed and the Android SDK set up. If you don’t have it installed:
+      - Download and install Android Studio.
+      - During the installation, make sure you add necessary SDK components such as Android SDK and Android Virtual Device       (AVD).
+     
+   - Set environment variables:
    
-   You need to add the Android SDK paths to your environment variables. For macOS or Linux, add the following to your ~/.bash_profile or ~/.zshrc (or the appropriate shell configuration file):
+   You need to add the Android SDK paths to your environment variables. For macOS or Linux, add the following to your         ~/.bash_profile or ~/.zshrc (or the appropriate shell configuration file):
    ```bash
    export ANDROID_HOME=$HOME/Library/Android/sdk
    export PATH=$PATH:$ANDROID_HOME/emulator
@@ -85,23 +87,41 @@ To run this project locally, follow these steps:
    export PATH=$PATH:$ANDROID_HOME/tools/bin
    export PATH=$PATH:$ANDROID_HOME/platform-tools
    
-For Windows, add these paths through "Environment Variables" in the system settings.
+   For Windows, add these paths through "Environment Variables" in the system settings.
 
-6. Start an emulator or connect a device:
+   - Start an emulator or connect a device:
    
-   - To use an Android emulator, open Android Studio and launch your emulator via the AVD Manager.
-   - Alternatively, connect your real Android device via USB and enable Developer Mode and USB Debugging.
+      To use an Android emulator, open Android Studio and launch your emulator via the AVD Manager.
+      Alternatively, connect your real Android device via USB and enable Developer Mode and USB Debugging.
      
-7. Run the app:
+   - Run the app:
    
-   You can now run your app on Android using the following command:
-   ```bash
-   npx react-native run-android
+      You can now run your app on Android using the following command:
+      ```bash
+      npx react-native run-android
    
-This will start the Metro Bundler and install the app on the connected device or emulator.
+   This will start the Metro Bundler and install the app on the connected device or emulator.
 
-8. Troubleshooting:
+5. iOS Installation (for macOS users):
+
+   - Install Xcode
+        Ensure that Xcode is installed from the Mac App Store. This is necessary for running your React Native project on iOS.
+   - Install CocoaPods:
+         CocoaPods is a dependency manager for iOS. Install it if you haven't already:
+         ```bash
+         sudo gem install cocoapods
+   - Navigate to the ios folder of your project and install iOS dependencies:
+         ```bash
+         cd ios
+         pod install
+         cd ..
+   - Run the iOS app: You can run the app on an iOS simulator or a real device. For the simulator:
+         ```bash
+         npx react-native run-ios
    
+       Alternatively, you can open the .xcworkspace file in Xcode and run the app from there.
+
+6. Troubleshooting: 
    If you encounter errors, check whether all dependencies and tools are installed correctly and make sure your device or emulator is properly connected.
    
    Once done, your app should run on Android.
